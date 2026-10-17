@@ -8,6 +8,8 @@
 | **Group Sort** | OL2 – skeletal vs cardiac vs smooth muscle | Memory Match (picture ↔ name) or Conveyor Sort into three bins. |
 | **Diameter** | OL3 – organization from whole muscle to molecules | Six-stage adventure: zoom dive, sarcomere jigsaw, connective tissue, contraction steps, picture jigsaw, DMD/MG clinic. |
 
+**▶ Play online:** https://patiphatdam.github.io/Muscle-games/
+
 All games include combos, a countdown timer, 1–3 stars, achievements, sound (mutable), a mascot (Myo) and a review screen of missed questions.
 
 ## Run locally
@@ -24,6 +26,7 @@ Open http://localhost:5173 — a demo "host site" with a **Games** menu.
 | `npm run dev` | Dev server with the demo host site |
 | `npm run build` | Production build of the demo host site → `dist/` |
 | `npm run build:share` | One self-contained HTML file → `dist-artifact/` |
+| `npm run build:pages` | Static site for GitHub Pages → `dist-pages/` (deployed automatically on every push to `main`) |
 
 ## Add the games to your React site
 

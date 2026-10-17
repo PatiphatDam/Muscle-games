@@ -5,3 +5,4 @@ dist-artifact/
 *.log
 .DS_Store
 Thumbs.db
+dist-pages/
