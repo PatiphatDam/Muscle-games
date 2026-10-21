@@ -51,9 +51,9 @@ export default function MuscleGames({ onGameFinish, className = '' }) {
             <GameErrorBoundary>
               <Routes>
                 <Route index element={<GamesHub />} />
-                <Route path="balloon-pop" element={<GamePage game={gameById('balloon-pop')} Game={BalloonPop} />} />
-                <Route path="group-sort" element={<GamePage game={gameById('group-sort')} Game={GroupSort} />} />
-                <Route path="diameter" element={<GamePage game={gameById('diameter')} Game={Diameter} />} />
+                <Route path="balloon-pop" element={<GamePage key="balloon-pop" game={gameById('balloon-pop')} Game={BalloonPop} />} />
+                <Route path="group-sort" element={<GamePage key="group-sort" game={gameById('group-sort')} Game={GroupSort} />} />
+                <Route path="diameter" element={<GamePage key="diameter" game={gameById('diameter')} Game={Diameter} />} />
                 <Route path="*" element={<Navigate to=".." replace />} />
               </Routes>
             </GameErrorBoundary>

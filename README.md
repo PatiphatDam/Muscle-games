@@ -5,7 +5,7 @@
 | Game | Learning objective | What you do |
 |---|---|---|
 | **Balloon Pop** | OL1 – functions and properties of muscle tissue | Shoot darts at the balloon that matches each clue. Gold, ice and bomb balloons, ATP power-up. |
-| **Group Sort** | OL2 – skeletal vs cardiac vs smooth muscle | Memory Match (picture ↔ name) or Conveyor Sort into three bins. |
+| **Group Sort** | OL2 – skeletal vs cardiac vs smooth muscle | Picture Match (3 rounds: picture ↔ name / key feature, all cards face up) or Conveyor Sort into three bins. |
 | **Diameter** | OL3 – organization from whole muscle to molecules | Six-stage adventure: zoom dive, sarcomere jigsaw, connective tissue, contraction steps, picture jigsaw, DMD/MG clinic. |
 
 **▶ Play online:** https://patiphatdam.github.io/Muscle-games/

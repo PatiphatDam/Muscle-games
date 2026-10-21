@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useScores } from '../scores.jsx';
 import { MascotBar, useFx, useFxState } from '../fx/Fx.jsx';
@@ -13,6 +13,18 @@ const CHEERS = {
   0: 'ไม่เป็นไรนะ ทบทวนข้อที่พลาดแล้วลองใหม่!',
 };
 
+const newRunId = () => (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+
+function dedupe(mistakes = []) {
+  const seen = new Set();
+  return mistakes.filter((m) => {
+    const id = `${m.prompt}|${m.yours}`;
+    if (seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
+}
+
 // Shared frame for every game: header, Myo, live score, session best, results, review and replay.
 export default function GamePage({ game, Game }) {
   const { best, submit, unlock } = useScores();
@@ -24,6 +36,10 @@ export default function GamePage({ game, Game }) {
   const [result, setResult] = useState(null);
   const [scoreKey, setScoreKeyState] = useState(game.keys[0]);
   const keyRef = useRef(scoreKey);
+  const runIdRef = useRef(newRunId());
+  // A game may register a function returning { score, info } for a run that is left before it ends.
+  const exitReportRef = useRef(null);
+  const reportedRef = useRef(false);
 
   const setScoreKey = useCallback((key) => {
     keyRef.current = key;
@@ -35,32 +51,25 @@ export default function GamePage({ game, Game }) {
     fx.say('', 'idle');
   }, [run, fx]);
 
-  const finish = useCallback(
-    (final, info = {}) => {
+  // Saves a run: session best, achievements and the host's onGameFinish hook (GAME-7 database).
+  const record = useCallback(
+    (final, info, completed) => {
+      reportedRef.current = true;
       const key = info.key || keyRef.current;
       const stars = starsFor(key, final);
       const isNewBest = submit(key, final);
       const earned = game.achievements.filter((a) => a.test({ ...info.stats, stars })).map((a) => a.id);
       const fresh = unlock(game.id, earned);
-      fx.sound('win');
-      if (stars >= 2) fx.burst(window.innerWidth / 2, window.innerHeight / 3, 48);
-      fx.say(CHEERS[stars], stars ? 'happy' : 'sad');
-      const seen = new Set();
-      const mistakes = (info.mistakes || []).filter((m) => {
-        const id = `${m.prompt}|${m.yours}`;
-        if (seen.has(id)) return false;
-        seen.add(id);
-        return true;
-      });
-      const unlockedNow = game.achievements.filter((a) => fresh.includes(a.id));
-      // Hook for the host site, e.g. saving the run to the database (GAME-7).
+      const mistakes = dedupe(info.mistakes);
       try {
-        onGameFinish?.({
+        const saved = onGameFinish?.({
+          runId: info.runId || runIdRef.current,
           gameId: game.id,
           mode: key.includes(':') ? key.split(':')[1] : null,
           scoreKey: key,
           score: final,
           stars,
+          completed,
           isNewBest,
           achievements: earned,
           newAchievements: fresh,
@@ -68,9 +77,46 @@ export default function GamePage({ game, Game }) {
           summary: info.summary ?? '',
           finishedAt: new Date().toISOString(),
         });
+        Promise.resolve(saved).catch((err) => console.error('[MuscleGames] onGameFinish failed', err));
       } catch (err) {
         console.error('[MuscleGames] onGameFinish failed', err);
       }
+      return { key, stars, isNewBest, mistakes, fresh };
+    },
+    [game, submit, unlock, onGameFinish]
+  );
+
+  // Leaving (← Games, Back, restart) in the middle of a run still saves what was played, if the game supports it.
+  const reportExit = useCallback(() => {
+    if (reportedRef.current) return;
+    const report = exitReportRef.current?.();
+    if (report) record(report.score, report.info, false);
+  }, [record]);
+  const reportExitRef = useRef(reportExit);
+  reportExitRef.current = reportExit;
+  const mountedRef = useRef(false);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      // Deferred so StrictMode's dev-only unmount/remount does not count as leaving.
+      setTimeout(() => {
+        if (!mountedRef.current) reportExitRef.current();
+      }, 0);
+    };
+  }, []);
+
+  const setExitReport = useCallback((fn) => {
+    exitReportRef.current = fn;
+  }, []);
+
+  const finish = useCallback(
+    (final, info = {}) => {
+      const { key, stars, isNewBest, mistakes, fresh } = record(final, info, true);
+      fx.sound('win');
+      if (stars >= 2) fx.burst(window.innerWidth / 2, window.innerHeight / 3, 48);
+      fx.say(CHEERS[stars], stars ? 'happy' : 'sad');
+      const unlockedNow = game.achievements.filter((a) => fresh.includes(a.id));
       setResult({
         score: final,
         key,
@@ -81,10 +127,14 @@ export default function GamePage({ game, Game }) {
         fresh: unlockedNow,
       });
     },
-    [fx, game, submit, unlock, onGameFinish]
+    [fx, game, record]
   );
 
   const restart = () => {
+    reportExit();
+    reportedRef.current = false;
+    exitReportRef.current = null;
+    runIdRef.current = newRunId();
     setRun((r) => r + 1);
     setScore(0);
     setResult(null);
@@ -132,7 +182,15 @@ export default function GamePage({ game, Game }) {
       <MascotBar fallback={game.intro} />
 
       <div className="mg-game-stage">
-        <Game key={run} onScore={setScore} onFinish={finish} setScoreKey={setScoreKey} />
+        <Game
+          key={run}
+          fresh={run > 0}
+          runId={runIdRef.current}
+          onScore={setScore}
+          onFinish={finish}
+          setScoreKey={setScoreKey}
+          setExitReport={setExitReport}
+        />
       </div>
 
       {result && (

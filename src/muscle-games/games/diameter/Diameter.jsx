@@ -11,6 +11,27 @@ const PLACE_POINTS = 20;
 const MISS_PENALTY = 5;
 const CLEAR_BONUS = 30;
 const COMBO_CAP = 3;
+// Cleared stages survive leaving the page (← Games) for the rest of the browser session.
+const PROGRESS_KEY = 'muscle-games:diameter-progress';
+
+function loadProgress() {
+  try {
+    const p = JSON.parse(sessionStorage.getItem(PROGRESS_KEY));
+    return p && Number.isInteger(p.current) && Array.isArray(p.results) ? p : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveProgress(p) {
+  try {
+    if (p) sessionStorage.setItem(PROGRESS_KEY, JSON.stringify(p));
+    else sessionStorage.removeItem(PROGRESS_KEY);
+  } catch {
+    /* storage unavailable: progress lasts until the page is left */
+  }
+}
+
 // Node positions on the adventure map, in % of the map box (bottom → top).
 const NODES = [
   [20, 88],
@@ -21,7 +42,7 @@ const NODES = [
   [60, 12],
 ];
 
-function AdventureMap({ current, results, onPlay, onFinishEarly }) {
+function AdventureMap({ current, results, resumed, onPlay, onFinishEarly }) {
   const path = NODES.map(([x, y], k) => `${k ? 'L' : 'M'}${x} ${y}`).join(' ');
   return (
     <div className="mg-adv">
@@ -60,6 +81,7 @@ function AdventureMap({ current, results, onPlay, onFinishEarly }) {
         })}
       </div>
       <div className="mg-adv__actions">
+        {resumed && <p className="mg-adv__resume">✅ บันทึกความคืบหน้าไว้แล้ว — เล่นต่อจากด่าน {current + 1} ได้เลย</p>}
         <button type="button" className="mg-btn mg-btn--primary mg-btn--pulse" onClick={() => onPlay(current)}>
           ▶ Play stage {current + 1}: {LEVELS[current].title}
         </button>
@@ -113,17 +135,59 @@ function LevelRunner({ level, index, onPlaced, onMissed, onDone }) {
   );
 }
 
-export default function Diameter({ onScore, onFinish }) {
+export default function Diameter({ onScore, onFinish, fresh, runId, setExitReport }) {
   const fx = useFx();
-  const st = useRef({ score: 0, streak: 0, maxStreak: 0, misses: 0, levelMisses: 0, mistakes: [], results: [] });
+  const [saved] = useState(() => {
+    if (fresh) saveProgress(null);
+    return fresh ? null : loadProgress();
+  });
+  const st = useRef({
+    runId: saved?.runId || runId,
+    score: saved?.score ?? 0,
+    streak: 0,
+    maxStreak: saved?.maxStreak ?? 0,
+    misses: saved?.misses ?? 0,
+    levelMisses: 0,
+    mistakes: saved?.mistakes ?? [],
+    results: saved?.results ?? [],
+    done: false,
+  });
   const [phase, setPhase] = useState('map');
-  const [current, setCurrent] = useState(0);
+  const [current, setCurrent] = useState(Math.min(saved?.current ?? 0, LEVELS.length - 1));
   const [clear, setClear] = useState(null);
   const [streak, setStreak] = useState(0);
   const s = st.current;
 
+  const report = () => {
+    const cleared = s.results.filter(Boolean).length;
+    return {
+      runId: s.runId,
+      summary: `${cleared}/${LEVELS.length} stages cleared · ${s.misses} wrong ${s.misses === 1 ? 'drop' : 'drops'}`,
+      mistakes: s.mistakes,
+      stats: {
+        explorer: cleared === LEVELS.length,
+        flawless: cleared === LEVELS.length && s.misses === 0,
+        builder: s.results[4]?.misses === 0,
+        doctor: s.results[5]?.misses === 0,
+        maxStreak: s.maxStreak,
+      },
+    };
+  };
+
   useEffect(() => {
-    fx.say('ออกสำรวจกล้ามเนื้อกัน! แตะด่านแรกบนแผนที่ได้เลย 🗺️', 'happy');
+    if (saved) {
+      onScore(s.score);
+      if (saved.current >= LEVELS.length) {
+        finish();
+        return;
+      }
+      fx.say(`ยินดีต้อนรับกลับ! เล่นต่อที่ด่าน ${saved.current + 1} ได้เลย 🗺️`, 'happy');
+    } else {
+      fx.say('ออกสำรวจกล้ามเนื้อกัน! แตะด่านแรกบนแผนที่ได้เลย 🗺️', 'happy');
+    }
+    // Leaving after clearing at least one stage still saves the run.
+    setExitReport?.(() => (!s.done && s.results.some(Boolean) ? { score: s.score, info: report() } : null));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fx]);
 
   const add = (pts) => {
@@ -165,6 +229,15 @@ export default function Diameter({ onScore, onFinish }) {
     const stars = timeLeft <= 0 ? 1 : s.levelMisses === 0 ? 3 : s.levelMisses <= 2 ? 2 : 1;
     s.results[current] = { stars, misses: s.levelMisses };
     s.levelMisses = 0;
+    saveProgress({
+      runId: s.runId,
+      current: current + 1,
+      score: s.score,
+      maxStreak: s.maxStreak,
+      misses: s.misses,
+      mistakes: s.mistakes,
+      results: s.results,
+    });
     fx.sound('win');
     fx.burst(window.innerWidth / 2, window.innerHeight / 3, 40);
     fx.say(stars === 3 ? 'สามดาว! ไร้ที่ติ 🌟' : 'ผ่านด่านแล้ว! 🎉', 'wow');
@@ -172,20 +245,12 @@ export default function Diameter({ onScore, onFinish }) {
     setPhase('clear');
   };
 
-  const finish = () => {
-    const cleared = s.results.filter(Boolean).length;
-    onFinish(s.score, {
-      summary: `${cleared}/${LEVELS.length} stages cleared · ${s.misses} wrong ${s.misses === 1 ? 'drop' : 'drops'}`,
-      mistakes: s.mistakes,
-      stats: {
-        explorer: cleared === LEVELS.length,
-        flawless: cleared === LEVELS.length && s.misses === 0,
-        builder: s.results[4]?.misses === 0,
-        doctor: s.results[5]?.misses === 0,
-        maxStreak: s.maxStreak,
-      },
-    });
-  };
+  function finish() {
+    if (s.done) return;
+    s.done = true;
+    saveProgress(null);
+    onFinish(s.score, report());
+  }
 
   const goNext = (toMap) => {
     if (current + 1 >= LEVELS.length) {
@@ -208,7 +273,7 @@ export default function Diameter({ onScore, onFinish }) {
       </div>
 
       {phase === 'map' && (
-        <AdventureMap current={current} results={s.results} onPlay={() => setPhase('play')} onFinishEarly={finish} />
+        <AdventureMap current={current} results={s.results} resumed={Boolean(saved) && current > 0} onPlay={() => setPhase('play')} onFinishEarly={finish} />
       )}
 
       {phase === 'play' && <LevelRunner key={current} index={current} level={LEVELS[current]} onPlaced={placed} onMissed={missed} onDone={levelDone} />}

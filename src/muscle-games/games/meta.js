@@ -21,14 +21,14 @@ export const GAMES = [
   {
     id: 'group-sort',
     title: 'Group Sort',
-    goal: 'Match picture cards from memory, or race the conveyor belt sorting skeletal, cardiac and smooth muscle.',
+    goal: 'Match each picture with its name or key feature, or race the conveyor belt sorting skeletal, cardiac and smooth muscle.',
     lo: 'OL2',
     loText: 'Differentiate the gross and microscopic characteristics of skeletal, cardiac and smooth muscle',
-    minutes: '1–2 min',
+    minutes: '2–3 min',
     badge: 'NEW',
     keys: ['group-sort:memory', 'group-sort:conveyor'],
-    modeLabels: { 'group-sort:memory': 'Memory', 'group-sort:conveyor': 'Conveyor' },
-    intro: 'เลือกโหมดก่อนเลย! จับคู่การ์ด หรือ สายพานคัดแยก?',
+    modeLabels: { 'group-sort:memory': 'Picture Match', 'group-sort:conveyor': 'Conveyor' },
+    intro: 'เลือกโหมดก่อนเลย! จับคู่ภาพ หรือ สายพานคัดแยก?',
     achievements: [
       { id: 'mem_perfect', icon: '🧠', name: 'ความจำเลิศ', desc: 'โหมดจับคู่: ไม่พลิกผิดเลย', test: (s) => s.memPerfect },
       { id: 'mem_fast', icon: '⚡', name: 'ไวปานสายฟ้า', desc: 'โหมดจับคู่: ครบทุกคู่โดยเหลือเวลา 45 วินาที', test: (s) => s.memFast },
@@ -60,7 +60,7 @@ export const GAMES = [
 // Score needed for 1, 2 and 3 stars.
 const STAR_THRESHOLDS = {
   'balloon-pop': [80, 180, 300],
-  'group-sort:memory': [100, 200, 280],
+  'group-sort:memory': [300, 600, 850],
   'group-sort:conveyor': [100, 250, 450],
   diameter: [600, 1200, 1700],
 };

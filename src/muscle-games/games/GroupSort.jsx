@@ -8,10 +8,10 @@ import Conveyor from './sort/Conveyor.jsx';
 const MODES = [
   {
     id: 'memory',
-    title: 'Memory Match',
-    icon: '🃏',
-    desc: 'Peek at 12 cards, then flip two at a time to match each picture with its name.',
-    meta: '6 pairs · 90 s',
+    title: 'Picture Match',
+    icon: '🖼️',
+    desc: 'All pictures are shown face up. Tap a picture, then its name or key feature — 3 rounds to clear.',
+    meta: '3 rounds · 18 pairs · 150 s',
   },
   {
     id: 'conveyor',
@@ -33,7 +33,7 @@ function ModeSelect({ onPick }) {
             <span className="mg-mode__art" aria-hidden="true">
               {m.id === 'memory' ? (
                 <span className="mg-mode__cards">
-                  {['?', '🫀', '?', '💪'].map((c, k) => (
+                  {['🫀', 'Aa', '💪', 'Aa'].map((c, k) => (
                     <i key={k} style={{ animationDelay: `${k * 0.15}s` }}>
                       {c}
                     </i>

@@ -36,15 +36,15 @@ export const TEXT_CARDS = [
 
 const hierarchy = (kind) => () => createElement(HierarchyArt, { kind });
 
-// Memory pairs: a picture card matched with its name card.
+// Picture Match pairs: a picture card matched with its name card, or (later rounds) with a key feature.
 export const PAIRS = [
-  { id: 'skeletal', name: 'Skeletal muscle', Art: SkeletalArt, why: 'Striated, cylindrical, many peripheral nuclei.' },
-  { id: 'cardiac', name: 'Cardiac muscle', Art: CardiacArt, why: 'Branched, striated, intercalated discs.' },
-  { id: 'smooth', name: 'Smooth muscle', Art: SmoothArt, why: 'Spindle-shaped, no striations.' },
-  { id: 'muscle', name: 'Whole muscle', Art: hierarchy('muscle'), why: 'The organ, wrapped by epimysium and joined to bone by tendons.' },
-  { id: 'fascicle', name: 'Fascicle', Art: hierarchy('fascicle'), why: 'A bundle of muscle fibers wrapped by perimysium.' },
-  { id: 'fiber', name: 'Muscle fiber', Art: hierarchy('fiber'), why: 'One multinucleated muscle cell wrapped by endomysium.' },
-  { id: 'myofibril', name: 'Myofibril', Art: hierarchy('myofibril'), why: 'A rod of repeating sarcomeres inside the fiber.' },
-  { id: 'sarcomere', name: 'Sarcomere', Art: hierarchy('sarcomere'), why: 'Z disc to Z disc: the basic contractile unit.' },
-  { id: 'filaments', name: 'Actin + myosin', Art: hierarchy('filaments'), why: 'Thin (actin) and thick (myosin) myofilaments.' },
+  { id: 'skeletal', name: 'Skeletal muscle', clue: 'Striated, many nuclei at the edge', Art: SkeletalArt, why: 'Striated, cylindrical, many peripheral nuclei.' },
+  { id: 'cardiac', name: 'Cardiac muscle', clue: 'Branched cells joined by intercalated discs', Art: CardiacArt, why: 'Branched, striated, intercalated discs.' },
+  { id: 'smooth', name: 'Smooth muscle', clue: 'Spindle cells, no striations', Art: SmoothArt, why: 'Spindle-shaped, no striations.' },
+  { id: 'muscle', name: 'Whole muscle', clue: 'Wrapped by epimysium, joined to bone by tendons', Art: hierarchy('muscle'), why: 'The organ, wrapped by epimysium and joined to bone by tendons.' },
+  { id: 'fascicle', name: 'Fascicle', clue: 'Bundle of fibers wrapped by perimysium', Art: hierarchy('fascicle'), why: 'A bundle of muscle fibers wrapped by perimysium.' },
+  { id: 'fiber', name: 'Muscle fiber', clue: 'One multinucleated cell wrapped by endomysium', Art: hierarchy('fiber'), why: 'One multinucleated muscle cell wrapped by endomysium.' },
+  { id: 'myofibril', name: 'Myofibril', clue: 'Rod of repeating sarcomeres', Art: hierarchy('myofibril'), why: 'A rod of repeating sarcomeres inside the fiber.' },
+  { id: 'sarcomere', name: 'Sarcomere', clue: 'Z disc to Z disc — the contractile unit', Art: hierarchy('sarcomere'), why: 'Z disc to Z disc: the basic contractile unit.' },
+  { id: 'filaments', name: 'Actin + myosin', clue: 'Thin and thick myofilaments', Art: hierarchy('filaments'), why: 'Thin (actin) and thick (myosin) myofilaments.' },
 ];

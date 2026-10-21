@@ -60,11 +60,13 @@ URL ที่ได้:
 
 ```js
 {
+  runId: '3f0c…',                // id ของรอบที่เล่น — ส่งซ้ำได้ (เช่น Diameter ที่ออกแล้วกลับมาเล่นต่อ) ให้ฐานข้อมูล upsert ด้วย runId
   gameId: 'group-sort',          // 'balloon-pop' | 'group-sort' | 'diameter'
   mode: 'memory',                // เฉพาะ group-sort: 'memory' | 'conveyor', เกมอื่นเป็น null
   scoreKey: 'group-sort:memory',
   score: 413,
   stars: 3,                      // 0–3
+  completed: true,               // false = ผู้เล่นกดออก (← Games / ↻) ก่อนจบ แต่มีความคืบหน้าแล้ว (Diameter) — บันทึกคะแนนเท่าที่เล่นได้
   isNewBest: true,               // ดีที่สุดใน session นี้หรือไม่
   achievements: ['mem_fast', 'stars3'],
   newAchievements: ['stars3'],
@@ -87,7 +89,7 @@ async function saveRun(run) {
 }
 ```
 
-ถ้า `onGameFinish` เกิด error เกมจะไม่ค้าง (จับ error และ log ไว้ใน console)
+ถ้า `onGameFinish` เกิด error (หรือคืน Promise ที่ reject) เกมจะไม่ค้าง (จับ error และ log ไว้ใน console)
 
 ## 4. การแยก CSS ไม่ให้ชนกับเว็บหลัก
 
@@ -113,6 +115,7 @@ async function saveRun(run) {
 
 ## 6. พฤติกรรมที่ควรรู้
 
+- **Diameter** จำด่านที่ผ่านแล้วไว้ใน `sessionStorage` — กด ← Games แล้วกลับมาจะเล่นต่อจากด่านถัดไปได้ (กด ↻ เพื่อเริ่มใหม่)
 - **คะแนนสูงสุดและเหรียญ** เก็บใน `sessionStorage` ของแท็บนั้นเท่านั้น (ปิดแท็บแล้วหาย) การบันทึกถาวรให้ทำผ่าน `onGameFinish`
 - **เสียง** สร้างด้วย Web Audio (ไม่มีไฟล์เสียง) ผู้เล่นปิดเสียงได้ที่ปุ่ม 🔊 ค่านี้จำไว้ใน `localStorage`
 - **การลากวาง** ใช้ Pointer Events ใช้ได้ทั้งเมาส์และนิ้ว และมีโหมด "แตะชิ้น → แตะช่อง" สำหรับคนที่ลากไม่ถนัดหรือใช้คีย์บอร์ด
