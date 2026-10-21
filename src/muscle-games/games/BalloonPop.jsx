@@ -31,7 +31,7 @@ const ROUNDS = 10;
 const LIVES = 3;
 const TIME = 100;
 const ATP_MAX = 4;
-const COLORS = ['#c084fc', '#f472b6', '#7dd3fc', '#fdba74'];
+const COLORS = ['#5eead4', '#f9a8d4', '#7dd3fc', '#fdba74'];
 const PRAISE = ['เยี่ยมมาก! 🎯', 'แม่นสุด ๆ!', 'ถูกต้อง! 💪', 'เก่งจัง!', 'ปังมาก!'];
 const OOPS = ['อุ๊ย! ยังไม่ใช่', 'เกือบแล้ว ลองอีกลูก!', 'ไม่ใช่ลูกนั้นนะ 😅'];
 

@@ -5,7 +5,7 @@ import { isMuted, play, setMuted, vibrate } from './sound.js';
 const ApiContext = createContext(null);
 const StateContext = createContext(null);
 
-export const CONFETTI = ['#8b5cf6', '#f472b6', '#fbbf24', '#34d399', '#60a5fa', '#fb7185'];
+export const CONFETTI = ['#14b8a6', '#f472b6', '#fbbf24', '#34d399', '#60a5fa', '#fb7185'];
 export const GOLD = ['#fbbf24', '#f59e0b', '#fde68a', '#fff7cc'];
 export const ICE = ['#7dd3fc', '#bae6fd', '#e0f2fe', '#a5b4fc'];
 
