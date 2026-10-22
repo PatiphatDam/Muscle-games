@@ -32,8 +32,8 @@ const LIVES = 3;
 const TIME = 100;
 const ATP_MAX = 4;
 const COLORS = ['#5eead4', '#f9a8d4', '#7dd3fc', '#fdba74'];
-const PRAISE = ['เยี่ยมมาก! 🎯', 'แม่นสุด ๆ!', 'ถูกต้อง! 💪', 'เก่งจัง!', 'ปังมาก!'];
-const OOPS = ['อุ๊ย! ยังไม่ใช่', 'เกือบแล้ว ลองอีกลูก!', 'ไม่ใช่ลูกนั้นนะ 😅'];
+const PRAISE = ['Great shot! 🎯', 'Bullseye!', 'Correct! 💪', 'Nice one!', 'Awesome!'];
+const OOPS = ['Oops! Not that one', 'So close, try another!', 'Wrong balloon 😅'];
 
 function buildQuestions() {
   return sample(CLUES, ROUNDS).map((c, i) => {
@@ -148,7 +148,7 @@ export default function BalloonPop({ onScore, onFinish }) {
   const s = st.current;
   const q = questions[s.i];
   const duration = Math.max(5, 8.5 - s.i * 0.35);
-  const [left] = useCountdown(TIME, { running: !s.over, onExpire: () => end('หมดเวลาแล้ว! ⏰') });
+  const [left] = useCountdown(TIME, { running: !s.over, onExpire: () => end('Time’s up! ⏰') });
 
   function end(line) {
     if (s.over) return;
@@ -183,7 +183,7 @@ export default function BalloonPop({ onScore, onFinish }) {
   const loseLife = () => {
     s.lives -= 1;
     rerender();
-    if (s.lives <= 0) end('หัวใจหมดแล้ว 💔');
+    if (s.lives <= 0) end('Out of hearts 💔');
   };
 
   // Shoot a dart from the launcher at an element, then resolve the hit where it lands.
@@ -230,7 +230,7 @@ export default function BalloonPop({ onScore, onFinish }) {
     fx.burst(x, y, golden ? 34 : 16, golden ? GOLD : undefined);
     fx.float(x, y - 24, `+${pts}${mult > 1 ? ` ×${mult}` : ''}${golden ? ' ⭐' : ''}`, golden ? 'gold' : 'good');
     fx.say(
-      golden ? 'บอลลูนทอง! คะแนน ×2 ✨' : mult > 1 ? `คอมโบ ×${mult}! ไฟลุกแล้ว 🔥` : s.atp === ATP_MAX ? 'ATP เต็มแล้ว! กดใช้พลังได้เลย ⚡' : pick(PRAISE),
+      golden ? 'Golden balloon! Points ×2 ✨' : mult > 1 ? `Combo ×${mult}! On fire 🔥` : s.atp === ATP_MAX ? 'ATP is full! Tap to use your power ⚡' : pick(PRAISE),
       golden || mult > 2 ? 'wow' : 'happy'
     );
     rerender();
@@ -252,10 +252,10 @@ export default function BalloonPop({ onScore, onFinish }) {
   const miss = () => {
     s.misses += 1;
     s.streak = 0;
-    s.mistakes.push({ prompt: q.text, yours: 'ปล่อยให้ลอยหนีไป', answer: q.answer });
+    s.mistakes.push({ prompt: q.text, yours: 'Let it float away', answer: q.answer });
     fx.sound('bad');
     fx.vibrate(120);
-    fx.say(`หลุดไปแล้ว! คำตอบคือ ${q.answer}`, 'sad');
+    fx.say(`It got away! The answer was ${q.answer}`, 'sad');
     loseLife();
     nextRound();
   };
@@ -267,7 +267,7 @@ export default function BalloonPop({ onScore, onFinish }) {
       fx.sound('pop');
       fx.sound('freeze');
       fx.burst(x, y, 24, ICE);
-      fx.say('บอลลูนน้ำแข็ง! ทุกลูกลอยช้าลง ❄️', 'wow');
+      fx.say('Ice balloon! Everything floats slower ❄️', 'wow');
       const setRate = (rate) =>
         skyRef.current?.getAnimations({ subtree: true }).forEach((a) => {
           if (a.animationName === 'mg-rise') a.playbackRate = rate;
@@ -284,7 +284,7 @@ export default function BalloonPop({ onScore, onFinish }) {
       fx.vibrate([80, 40, 80]);
       fx.burst(x, y, 26, ['#1f2937', '#f97316', '#fbbf24', '#ef4444']);
       fx.float(x, y, '💥', 'bad');
-      fx.say('ตู้ม! โดนระเบิด เสียหัวใจ 1 ดวง', 'sad');
+      fx.say('Boom! You hit a bomb and lost a heart', 'sad');
       setShake(true);
       later(() => setShake(false), 500);
       loseLife();
@@ -297,7 +297,7 @@ export default function BalloonPop({ onScore, onFinish }) {
     s.atpUsed += 1;
     setAssistFor(s.i);
     fx.sound('power');
-    fx.say('พลัง ATP! ตัดตัวเลือกผิดออก 2 ลูก ⚡', 'wow');
+    fx.say('ATP power! Two wrong balloons removed ⚡', 'wow');
     rerender();
   };
 

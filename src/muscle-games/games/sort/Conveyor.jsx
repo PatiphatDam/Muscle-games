@@ -28,10 +28,10 @@ export default function Conveyor({ onScore, onFinish }) {
   beltRef.current = belt;
   const overRef = useRef(false);
 
-  const [left] = useCountdown(TIME, { running: !over, onExpire: () => end('หมดเวลา! ⏰') });
+  const [left] = useCountdown(TIME, { running: !over, onExpire: () => end('Time’s up! ⏰') });
 
   useEffect(() => {
-    fx.say('ลากการ์ดลงตะกร้า หรือแตะตะกร้าเพื่อคัดใบที่เรืองแสง!', 'happy');
+    fx.say('Drag cards into a bin, or tap a bin to sort the glowing card!', 'happy');
     let t;
     const spawn = () => {
       if (overRef.current) return;
@@ -68,7 +68,7 @@ export default function Conveyor({ onScore, onFinish }) {
     s.lives -= 1;
     s.streak = 0;
     rerender();
-    if (s.lives <= 0) end('หัวใจหมดแล้ว 💔');
+    if (s.lives <= 0) end('Out of hearts 💔');
   };
 
   const flashBin = (bin, kind) => {
@@ -94,8 +94,8 @@ export default function Conveyor({ onScore, onFinish }) {
       fx.sound(mult > 1 ? 'combo' : 'good', mult);
       fx.burst(x, y - 20, 14);
       fx.float(x, y - 30, `+${pts}${mult > 1 ? ` ×${mult}` : ''}`);
-      if (mult > 1 && s.streak % 3 === 0) fx.say(`คอมโบ ×${mult}! มือไวมาก 🔥`, 'wow');
-      else if (s.sorted % 4 === 0) fx.say(pick(['คัดเก่งมาก!', 'สายพานเร็วขึ้นแล้วนะ!', 'ไปต่อ! 💪']), 'happy');
+      if (mult > 1 && s.streak % 3 === 0) fx.say(`Combo ×${mult}! Quick hands 🔥`, 'wow');
+      else if (s.sorted % 4 === 0) fx.say(pick(['Great sorting!', 'The belt is speeding up!', 'Keep going! 💪']), 'happy');
       flashBin(bin, 'good');
       rerender();
     } else {
@@ -104,7 +104,7 @@ export default function Conveyor({ onScore, onFinish }) {
       fx.sound('bad');
       fx.vibrate(120);
       fx.float(x, y - 30, '✗', 'bad');
-      fx.say(`ไม่ใช่ ${groupLabel(bin)} — เป็น ${groupLabel(item.card.answer)} นะ`, 'sad');
+      fx.say(`Not ${groupLabel(bin)}, it’s ${groupLabel(item.card.answer)}`, 'sad');
       flashBin(bin, 'bad');
       loseLife();
     }
@@ -115,10 +115,10 @@ export default function Conveyor({ onScore, onFinish }) {
     if (!item || overRef.current) return;
     setBelt((b) => b.filter((c) => c.uid !== uid));
     s.fell += 1;
-    s.mistakes.push({ prompt: item.card.text, yours: 'ตกสายพาน', answer: groupLabel(item.card.answer), why: item.card.why });
+    s.mistakes.push({ prompt: item.card.text, yours: 'Fell off the belt', answer: groupLabel(item.card.answer), why: item.card.why });
     fx.sound('bad');
     fx.vibrate(100);
-    fx.say('ร่วงไปหนึ่งใบ! 😱', 'sad');
+    fx.say('One fell off! 😱', 'sad');
     loseLife();
   };
 

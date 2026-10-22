@@ -38,7 +38,7 @@ import { MuscleGames } from './muscle-games';
 <Route path="/games/*" element={<MuscleGames onGameFinish={saveRun} />} />
 ```
 
-Requires React 18+ and react-router-dom 6.7+. Full guide (Thai): [INTEGRATION.md](INTEGRATION.md).
+Requires React 18+ and react-router-dom 6.7+. Full guide: [INTEGRATION.md](INTEGRATION.md).
 
 ## Project layout
 

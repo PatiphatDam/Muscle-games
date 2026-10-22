@@ -1,82 +1,82 @@
-# Muscle Games — คู่มือนำเกมไปใส่เว็บหลัก (React)
+# Muscle Games — adding the games to the main site (React)
 
-โมดูลเกม 3 เกม (Balloon Pop · Group Sort · Diameter) สำหรับบท *Muscular Tissues I*
-เขียนด้วย React + HTML5 + CSS3 รองรับ Responsive บนสมาร์ตโฟน (≥360px), แท็บเล็ต และคอมพิวเตอร์
+A module of 3 games (Balloon Pop · Group Sort · Diameter) for the *Muscular Tissues I* lecture.
+Built with React + HTML5 + CSS3; responsive on phones (≥360px), tablets and desktops.
 
-ทุกอย่างอยู่ในโฟลเดอร์เดียว: **`src/muscle-games/`**
+Everything lives in one folder: **`src/muscle-games/`**
 
 ---
 
-## 1. สิ่งที่เว็บหลักต้องมี
+## 1. What the main site needs
 
-| แพ็กเกจ | เวอร์ชัน |
+| Package | Version |
 |---|---|
-| `react`, `react-dom` | 18 ขึ้นไป |
-| `react-router-dom` | 6.7 ขึ้นไป (ใช้ `<Routes>` แบบซ้อน) |
+| `react`, `react-dom` | 18 or later |
+| `react-router-dom` | 6.7 or later (uses nested `<Routes>`) |
 
-ใช้ได้ทั้งโปรเจกต์ **Vite** และ **Create React App** ไม่ต้องติดตั้งไลบรารีอื่นเพิ่ม
+Works in both **Vite** and **Create React App** projects. No other libraries are needed.
 
 ```bash
 npm install react-router-dom@6
 ```
 
-## 2. ติดตั้ง (3 ขั้นตอน)
+## 2. Install (3 steps)
 
-**① คัดลอกโฟลเดอร์** `src/muscle-games/` ไปไว้ใน `src/` ของเว็บหลัก
+**① Copy the folder** `src/muscle-games/` into the main site's `src/`.
 
-**② เพิ่ม Route** ในไฟล์ที่มี `<Routes>` ของเว็บหลัก (ต้องลงท้าย `/*`)
+**② Add a route** in the file that holds the main site's `<Routes>` (the path must end in `/*`).
 
 ```jsx
 import { MuscleGames } from './muscle-games';
 
 <Routes>
-  {/* ...route เดิมของเว็บ... */}
+  {/* ...the site's existing routes... */}
   <Route path="/games/*" element={<MuscleGames onGameFinish={saveRun} />} />
 </Routes>
 ```
 
-**③ ใส่ลิงก์ในเมนู** เช่น `<Link to="/games">Games</Link>` เท่านี้ก็ใช้งานได้
+**③ Add a menu link**, e.g. `<Link to="/games">Games</Link>`. That's it.
 
-> ลิงก์ภายในเกมเป็นแบบ relative ทั้งหมด จะเปลี่ยน path เป็น `/learning/muscle/games/*` ก็ได้ ไม่ต้องแก้โค้ดเกม
-> เกมใช้ Router ของเว็บหลัก (ห้ามครอบ `<BrowserRouter>` ซ้อนอีกชั้น)
+> All links inside the games are relative, so you can mount them at `/learning/muscle/games/*` without changing any game code.
+> The games use the main site's router — don't wrap them in another `<BrowserRouter>`.
 
-URL ที่ได้:
+Resulting URLs:
 
-| URL | หน้า |
+| URL | Page |
 |---|---|
-| `/games` | หน้ารวมเกม (Game cards) |
+| `/games` | Games hub (game cards) |
 | `/games/balloon-pop` | Balloon Pop (OL1) |
 | `/games/group-sort` | Group Sort (OL2) |
 | `/games/diameter` | Diameter (OL3) |
 
 ## 3. Props
 
-| Prop | ชนิด | ความหมาย |
+| Prop | Type | Meaning |
 |---|---|---|
-| `onGameFinish` | `(run) => void` | เรียกทุกครั้งที่เล่นจบ 1 รอบ ใช้บันทึกคะแนนลงฐานข้อมูล (GAME-7) |
-| `className` | `string` | class เพิ่มเติมที่ตัวครอบ `.mg-root` |
+| `onGameFinish` | `(run) => void \| Promise` | Called every time a run ends; use it to save the score to the database (GAME-7) |
+| `className` | `string` | Extra class on the `.mg-root` wrapper |
 
-ข้อมูลที่ส่งมาใน `run`:
+The `run` object:
 
 ```js
 {
-  runId: '3f0c…',                // id ของรอบที่เล่น — ส่งซ้ำได้ (เช่น Diameter ที่ออกแล้วกลับมาเล่นต่อ) ให้ฐานข้อมูล upsert ด้วย runId
+  runId: '3f0c…',                // id of this play-through; may be sent again (e.g. Diameter resumed after leaving), so upsert by runId
   gameId: 'group-sort',          // 'balloon-pop' | 'group-sort' | 'diameter'
-  mode: 'memory',                // เฉพาะ group-sort: 'memory' | 'conveyor', เกมอื่นเป็น null
+  mode: 'memory',                // group-sort only: 'memory' | 'conveyor'; null for the other games
   scoreKey: 'group-sort:memory',
   score: 413,
   stars: 3,                      // 0–3
-  completed: true,               // false = ผู้เล่นกดออก (← Games / ↻) ก่อนจบ แต่มีความคืบหน้าแล้ว (Diameter) — บันทึกคะแนนเท่าที่เล่นได้
-  isNewBest: true,               // ดีที่สุดใน session นี้หรือไม่
+  completed: true,               // false = the player left (← Games / ↻) before the end with some progress (Diameter); the score so far is saved
+  isNewBest: true,               // best in this browser session?
   achievements: ['mem_fast', 'stars3'],
   newAchievements: ['stars3'],
-  mistakes: [{ prompt, yours, answer, why }],   // ข้อที่พลาด (ใช้วิเคราะห์ผลการเรียนได้)
-  summary: '6/6 pairs · time bonus +170',
+  mistakes: [{ prompt, yours, answer, why }],   // missed questions (useful for learning analytics)
+  summary: '18/18 pairs · 0 wrong · time bonus +170',
   finishedAt: '2026-10-17T09:30:00.000Z'
 }
 ```
 
-ตัวอย่างบันทึกลง API:
+Example: saving to an API
 
 ```jsx
 async function saveRun(run) {
@@ -89,62 +89,63 @@ async function saveRun(run) {
 }
 ```
 
-ถ้า `onGameFinish` เกิด error (หรือคืน Promise ที่ reject) เกมจะไม่ค้าง (จับ error และ log ไว้ใน console)
+If `onGameFinish` throws (or returns a rejected Promise) the game keeps working; the error is logged to the console.
 
-## 4. การแยก CSS ไม่ให้ชนกับเว็บหลัก
+## 4. Keeping CSS separate from the main site
 
-- ทุก class ขึ้นต้นด้วย `mg-` และทุกกฎ CSS อยู่ภายใต้ `.mg-root`
-- ไม่มีกฎ CSS ที่แตะ `body`, `html`, `h1`, `button` ของเว็บหลัก
-- ฟอนต์ **Prompt** โหลดเองจาก Google Fonts (`@import` ในไฟล์ `styles.css`)
-- แอปตัวอย่าง (`src/demo-host.css`) ใส่สไตล์ที่ตั้งใจให้ชน เช่น `h1` สีแดงตัวพิมพ์ใหญ่ `.btn` สีส้ม และทดสอบแล้วว่าไม่ทะลุเข้ามาในเกม
+- Every class starts with `mg-` and every CSS rule is scoped under `.mg-root`.
+- No rules touch the main site's `body`, `html`, `h1` or `button`.
+- Fonts (**Nunito Sans**, **Playfair Display**, **Noto Sans Thai**) load from Google Fonts via `@import` in `styles.css`.
+- The demo app (`src/demo-host.css`) adds deliberately clashing styles (a red upper-case `h1`, an orange `.btn`) and they don't leak into the games.
+- Dark mode follows the device setting, or the host's `<html data-theme="light|dark">`.
 
-เปลี่ยนสีธีมได้โดย override ตัวแปร CSS ที่ `.mg-root` เช่น
+Change the theme colours by overriding the CSS variables on `.mg-root`, for example:
 
 ```css
-.mg-root { --violet-600: #0e7490; --violet-700: #155e75; }
+.mg-root { --sea-600: #0e7490; --sea-700: #155e75; }
 ```
 
-## 5. แก้ไขเนื้อหา / คำถาม
+## 5. Editing content / questions
 
-| เกม | ไฟล์ |
+| Game | File |
 |---|---|
-| Balloon Pop — คำใบ้ ตัวเลือก | `games/BalloonPop.jsx` (`CLUES`, `PROPERTIES`, `FUNCTIONS`) |
-| Group Sort — การ์ดคัดแยก / คู่การ์ด | `games/sort/data.js` |
-| Diameter — ทั้ง 6 ด่าน | `games/diameter/levels.js` |
-| ชื่อเกม, OL, เวลาเล่น, เหรียญรางวัล, เกณฑ์ดาว | `games/meta.js` |
+| Balloon Pop — clues and choices | `games/BalloonPop.jsx` (`CLUES`, `PROPERTIES`, `FUNCTIONS`) |
+| Group Sort — conveyor cards / picture pairs | `games/sort/data.js` |
+| Diameter — all 6 stages | `games/diameter/levels.js` |
+| Game names, OL, play time, achievements, star thresholds | `games/meta.js` |
 
-## 6. พฤติกรรมที่ควรรู้
+## 6. Behaviour to know about
 
-- **Diameter** จำด่านที่ผ่านแล้วไว้ใน `sessionStorage` — กด ← Games แล้วกลับมาจะเล่นต่อจากด่านถัดไปได้ (กด ↻ เพื่อเริ่มใหม่)
-- **คะแนนสูงสุดและเหรียญ** เก็บใน `sessionStorage` ของแท็บนั้นเท่านั้น (ปิดแท็บแล้วหาย) การบันทึกถาวรให้ทำผ่าน `onGameFinish`
-- **เสียง** สร้างด้วย Web Audio (ไม่มีไฟล์เสียง) ผู้เล่นปิดเสียงได้ที่ปุ่ม 🔊 ค่านี้จำไว้ใน `localStorage`
-- **การลากวาง** ใช้ Pointer Events ใช้ได้ทั้งเมาส์และนิ้ว และมีโหมด "แตะชิ้น → แตะช่อง" สำหรับคนที่ลากไม่ถนัดหรือใช้คีย์บอร์ด
-- **ปุ่ม/เป้าแตะ** ขนาด ≥ 44px, เคารพ `prefers-reduced-motion`
-- **Responsive**: หน้ารวมเกม 1 คอลัมน์บนมือถือ, 2 คอลัมน์บนแท็บเล็ต, 3 คอลัมน์ที่ ≥1024px
-- เกมทุกเกมเปิดให้เล่นได้เสมอ ไม่มีล็อก Pretest
-- เบราว์เซอร์ที่รองรับ: Chrome, Edge, Safari, Firefox รุ่นปัจจุบัน (iOS Safari 15+)
+- **Diameter** remembers cleared stages in `sessionStorage`: press ← Games, come back, and it resumes at the next stage (press ↻ to start over).
+- **Best scores and badges** are kept in that tab's `sessionStorage` only (gone when the tab closes). Save permanently through `onGameFinish`.
+- **Sound** is generated with Web Audio (no audio files). Players can mute with the 🔊 button; the setting is kept in `localStorage`.
+- **Drag and drop** uses Pointer Events, so it works with mouse and touch, plus a "tap a piece → tap a slot" mode for players who can't drag or use a keyboard.
+- **Buttons / tap targets** are ≥ 44px and respect `prefers-reduced-motion`.
+- **Responsive**: the hub shows 1 column on phones, 2 on tablets and 3 at ≥1024px.
+- Every game is always open; there is no Pretest lock.
+- Supported browsers: current Chrome, Edge, Safari and Firefox (iOS Safari 15+).
 
-## 7. ลองรันแอปตัวอย่างในโปรเจกต์นี้
+## 7. Running the demo app in this project
 
 ```bash
 npm install
 npm run dev
 ```
 
-เปิด `http://localhost:5173` → เมนู Games (ไฟล์ `src/App.jsx` คือตัวอย่างการต่อเข้าเว็บหลัก)
-เมื่อเล่นจบจะเห็นข้อมูล `run` ใน console
+Open `http://localhost:5173` → Games menu (`src/App.jsx` shows how to plug the module into a host site).
+When a run ends, its `run` object is logged to the console.
 
-## 8. โครงสร้างไฟล์
+## 8. File layout
 
 ```
 src/muscle-games/
-├── index.js              ← import จากตรงนี้
-├── MuscleGames.jsx       ← คอมโพเนนต์หลัก (Routes + providers + error boundary)
-├── styles.css            ← CSS ทั้งหมด (prefix mg-)
-├── GamesHub.jsx          ← หน้ารวมเกม
-├── covers.jsx, art.jsx   ← ภาพปกและภาพประกอบ (SVG)
+├── index.js              ← import from here
+├── MuscleGames.jsx       ← main component (Routes + providers + error boundary)
+├── styles.css            ← all CSS (prefix mg-)
+├── GamesHub.jsx          ← games hub
+├── covers.jsx, art.jsx   ← cover scenes and illustrations (SVG)
 ├── scores.jsx, config.js
-├── components/           ← GamePage (กรอบเกม/หน้าผลลัพธ์), Hud (เวลา คอมโบ ดาว)
-├── fx/                   ← เสียง พลุ มาสคอต Armin ระบบลากวาง จิ๊กซอว์
+├── components/           ← GamePage (game frame / results), Hud (timer, combo, stars)
+├── fx/                   ← sound, confetti, the Armin mascot, drag and drop, jigsaw
 └── games/                ← BalloonPop, GroupSort (+sort/), diameter/, meta.js
 ```
