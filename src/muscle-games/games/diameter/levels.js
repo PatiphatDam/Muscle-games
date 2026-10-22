@@ -101,7 +101,7 @@ export const LEVELS = [
     icon: '🩺',
     title: 'Muscle Clinic',
     zone: 'Disorders',
-    intro: 'คุณหมอ Dukki มีผู้ป่วย 2 ราย! ลากอาการและสาเหตุไปยังโรคที่ถูกต้อง',
+    intro: 'คุณหมอ Armin มีผู้ป่วย 2 ราย! ลากอาการและสาเหตุไปยังโรคที่ถูกต้อง',
     time: 90,
     slots: [
       { id: 'dmd', capacity: 5, icon: '🧬', title: 'Duchenne muscular dystrophy', sub: 'Structural protein problem' },

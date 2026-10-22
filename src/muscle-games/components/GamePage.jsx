@@ -25,7 +25,7 @@ function dedupe(mistakes = []) {
   });
 }
 
-// Shared frame for every game: header, Dukki, live score, session best, results, review and replay.
+// Shared frame for every game: header, Armin, live score, session best, results, review and replay.
 export default function GamePage({ game, Game }) {
   const { best, submit, unlock } = useScores();
   const fx = useFx();

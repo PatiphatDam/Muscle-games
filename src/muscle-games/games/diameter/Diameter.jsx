@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Dukki, pick, useFx } from '../../fx/Fx.jsx';
+import { Armin, pick, useFx } from '../../fx/Fx.jsx';
 import { ComboMeter, Stars, TimerBar, comboMult, useCountdown } from '../../components/Hud.jsx';
 import { LEVELS } from './levels.js';
 import ZoomDive from './ZoomDive.jsx';
@@ -62,7 +62,7 @@ function AdventureMap({ current, results, resumed, onPlay, onFinishEarly }) {
           const state = k < current ? 'done' : k === current ? 'now' : 'locked';
           return (
             <div key={lv.id} className={`mg-adv__node mg-adv__node--${state}`} style={{ left: `${NODES[k][0]}%`, top: `${NODES[k][1]}%` }}>
-              {state === 'now' && <Dukki mood="happy" className="mg-adv__mascot" />}
+              {state === 'now' && <Armin mood="happy" className="mg-adv__mascot" />}
               <button
                 type="button"
                 className="mg-adv__btn"
