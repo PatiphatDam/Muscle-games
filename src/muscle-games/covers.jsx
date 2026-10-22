@@ -1,4 +1,3 @@
-import { Dukki } from './fx/Fx.jsx';
 import { jigsawPath } from './fx/jigsaw.jsx';
 
 // Animated cartoon scenes for the hub cards.
@@ -74,7 +73,6 @@ export function BalloonScene() {
         <rect x="-4" y="0" width="28" height="18" rx="6" fill="hsl(165 50% 20%)" />
         <circle cx="10" cy="0" r="7" fill="hsl(165 52% 32%)" />
       </g>
-      <Dukki mood="happy" x="8" y="128" width="64" height="64" className="mg-sc-hop" />
     </svg>
   );
 }
@@ -159,7 +157,6 @@ export function CardTableScene() {
           <rect x="0" y="158" width="22" height="16" rx="3" fill="#fff" stroke="#f472b6" strokeWidth="1.5" />
         </g>
       ))}
-      <Dukki mood="wow" x="256" y="116" width="58" height="58" className="mg-sc-hop" />
     </svg>
   );
 }
@@ -220,7 +217,6 @@ export function MicroscopeScene() {
           <path key={k} d={`M${x} ${y - 7} L${x + 2} ${y - 2} L${x + 7} ${y} L${x + 2} ${y + 2} L${x} ${y + 7} L${x - 2} ${y + 2} L${x - 7} ${y} L${x - 2} ${y - 2}Z`} fill="#fde68a" />
         ))}
       </g>
-      <Dukki mood="happy" x="196" y="128" width="62" height="62" className="mg-sc-hop" />
       <g className="mg-sc-bob" style={{ animationDelay: '.4s' }}>
         <circle cx="262" cy="150" r="11" fill="hsl(195 60% 90%)" stroke="hsl(165 45% 15%)" strokeWidth="3" opacity=".9" />
         <line x1="270" y1="158" x2="282" y2="170" stroke="hsl(165 45% 15%)" strokeWidth="5" strokeLinecap="round" />
