@@ -145,6 +145,6 @@ src/muscle-games/
 ├── covers.jsx, art.jsx   ← ภาพปกและภาพประกอบ (SVG)
 ├── scores.jsx, config.js
 ├── components/           ← GamePage (กรอบเกม/หน้าผลลัพธ์), Hud (เวลา คอมโบ ดาว)
-├── fx/                   ← เสียง พลุ มาสคอต Myo ระบบลากวาง จิ๊กซอว์
+├── fx/                   ← เสียง พลุ มาสคอต Dukki ระบบลากวาง จิ๊กซอว์
 └── games/                ← BalloonPop, GroupSort (+sort/), diameter/, meta.js
 ```

@@ -10,7 +10,7 @@
 
 **▶ Play online:** https://patiphatdam.github.io/Muscle-games/
 
-All games include combos, a countdown timer, 1–3 stars, achievements, sound (mutable), a mascot (Myo) and a review screen of missed questions.
+All games include combos, a countdown timer, 1–3 stars, achievements, sound (mutable), a mascot (Dukki the skeleton) and a review screen of missed questions.
 
 ## Run locally
 

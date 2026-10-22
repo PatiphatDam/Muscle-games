@@ -202,22 +202,46 @@
 .mg-chip { font-size: 12.5px; font-weight: 700; padding: 4px 11px; border-radius: 999px; background: var(--card-chip); color: var(--card-text); }
 .mg-legend { margin-top: 10px; font-size: 13px; color: var(--muted); text-align: center; }
 
-/* ---------- Myo ---------- */
-.mg-myo { overflow: visible; }
-.mg-myo__arm--l { transform-origin: 14px 36px; animation: mg-flex-l 2.4s ease-in-out infinite; }
-.mg-myo__arm--r { transform-origin: 50px 36px; animation: mg-flex-r 2.4s ease-in-out infinite; }
-.mg-myo--happy .mg-myo__body { animation: mg-hop 0.6s ease-out; transform-origin: 32px 58px; }
-.mg-myo--wow .mg-myo__body { animation: mg-wow 0.5s ease-out; transform-origin: 32px 58px; }
-.mg-myo--sad .mg-myo__body { animation: mg-droop 0.6s ease-out; transform-origin: 32px 58px; }
-@keyframes mg-flex-l { 0%, 70%, 100% { transform: rotate(0); } 80% { transform: rotate(-14deg); } 90% { transform: rotate(4deg); } }
-@keyframes mg-flex-r { 0%, 20%, 100% { transform: rotate(0); } 30% { transform: rotate(14deg); } 40% { transform: rotate(-4deg); } }
-@keyframes mg-hop { 30% { transform: translateY(-8px) scaleY(1.06); } 60% { transform: translateY(0) scaleY(0.94); } }
-@keyframes mg-wow { 30% { transform: scale(1.18) rotate(-6deg); } 60% { transform: scale(0.96) rotate(4deg); } }
-@keyframes mg-droop { 40% { transform: translateY(3px) scaleY(0.9) rotate(-5deg); } }
+/* ---------- Dukki (skeleton mascot) ---------- */
+/* Arms turn at the shoulders and legs at the hips (origins set inline in Fx.jsx), so limbs stay on the skeleton. */
+.mg-dukki { overflow: visible; }
+.mg-dukki__body, .mg-dukki__head, .mg-dukki__arm, .mg-dukki__leg { transform-box: view-box; transition: transform 0.35s ease; }
+.mg-dukki__body { transform-origin: 60px 140px; }
+.mg-dukki__head { transform-origin: 60px 82px; }
+.mg-dukki__arm--l { transform: rotate(35deg); animation: mg-dk-idle-l 2.6s ease-in-out infinite; }
+.mg-dukki__arm--r { transform: rotate(-35deg); animation: mg-dk-idle-r 2.6s ease-in-out infinite; }
+/* happy: wave four times, then keep the arms up */
+.mg-dukki--happy .mg-dukki__body { animation: mg-dk-hop 0.45s ease-out 2 alternate; }
+.mg-dukki--happy .mg-dukki__arm--l { transform: rotate(132deg); animation: mg-dk-wave-l 0.4s ease-in-out 8 alternate; }
+.mg-dukki--happy .mg-dukki__arm--r { transform: rotate(-132deg); animation: mg-dk-wave-r 0.4s ease-in-out -0.4s 8 alternate; }
+.mg-dukki--happy .mg-dukki__leg--l { animation: mg-dk-kick-l 0.4s ease-in-out 8 alternate; }
+.mg-dukki--happy .mg-dukki__leg--r { animation: mg-dk-kick-r 0.4s ease-in-out -0.4s 8 alternate; }
+/* wow: jump with arms up and out */
+.mg-dukki--wow .mg-dukki__body { animation: mg-dk-hop 0.4s ease-out 4 alternate; }
+.mg-dukki--wow .mg-dukki__arm--l { transform: rotate(132deg); animation: mg-dk-up-l 0.18s linear 10 alternate; }
+.mg-dukki--wow .mg-dukki__arm--r { transform: rotate(-132deg); animation: mg-dk-up-r 0.18s linear -0.18s 10 alternate; }
+.mg-dukki--wow .mg-dukki__leg--l { transform: rotate(14deg); }
+.mg-dukki--wow .mg-dukki__leg--r { transform: rotate(-14deg); }
+/* sad: arms hang down, head droops and sways */
+.mg-dukki--sad .mg-dukki__arm--l { transform: rotate(6deg); animation: none; }
+.mg-dukki--sad .mg-dukki__arm--r { transform: rotate(-6deg); animation: none; }
+.mg-dukki--sad .mg-dukki__head { transform: rotate(-7deg); animation: mg-dk-sway 2.4s ease-in-out infinite; }
+.mg-dukki--sad .mg-dukki__leg--l { transform: rotate(-5deg); }
+.mg-dukki--sad .mg-dukki__leg--r { transform: rotate(5deg); }
+@keyframes mg-dk-idle-l { 50% { transform: rotate(28deg); } }
+@keyframes mg-dk-idle-r { 50% { transform: rotate(-28deg); } }
+@keyframes mg-dk-hop { to { transform: translateY(-7px); } }
+@keyframes mg-dk-wave-l { from { transform: rotate(115deg); } to { transform: rotate(150deg); } }
+@keyframes mg-dk-wave-r { from { transform: rotate(-115deg); } to { transform: rotate(-150deg); } }
+@keyframes mg-dk-kick-l { from { transform: rotate(0); } to { transform: rotate(12deg); } }
+@keyframes mg-dk-kick-r { from { transform: rotate(0); } to { transform: rotate(-12deg); } }
+@keyframes mg-dk-up-l { from { transform: rotate(124deg); } to { transform: rotate(140deg); } }
+@keyframes mg-dk-up-r { from { transform: rotate(-124deg); } to { transform: rotate(-140deg); } }
+@keyframes mg-dk-sway { 0%, 100% { transform: rotate(-7deg); } 50% { transform: rotate(-3deg) translateY(1px); } }
 
 /* ---------- Hub ---------- */
 .mg-hub-hero { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
-.mg-hub-hero__myo { width: 84px; flex: none; animation: mg-float 3s ease-in-out infinite; }
+.mg-hub-hero__mascot { width: 84px; flex: none; animation: mg-float 3s ease-in-out infinite; }
 .mg-eyebrow { color: var(--sea-600); font-weight: 700; font-size: 14px; letter-spacing: 0.04em; }
 .mg-hub-hero h1 { font-size: clamp(30px, 5vw, 40px); margin: 0 0 4px; line-height: 1.1; }
 .mg-lede { color: var(--muted); max-width: 62ch; line-height: 1.5; }
@@ -319,7 +343,7 @@
 }
 
 .mg-mascot-bar { display: flex; align-items: center; gap: 10px; margin: 10px 0 12px; min-height: 60px; }
-.mg-mascot-bar__myo { width: 58px; flex: none; }
+.mg-mascot-bar__mascot { width: 58px; flex: none; }
 .mg-mascot-bar__bubble {
   position: relative; padding: 10px 14px; border-radius: 16px; background: var(--surface); border: 1px solid var(--card-edge);
   font-weight: 500; line-height: 1.4; box-shadow: var(--shadow); animation: mg-bubble 0.3s ease-out;
@@ -611,7 +635,7 @@
 .mg-adv__node--now .mg-adv__btn { background: linear-gradient(180deg, #fde68a, #f59e0b); animation: mg-pulse-gold 1.2s ease-in-out infinite; }
 .mg-adv__node--locked .mg-adv__btn { background: var(--chip); box-shadow: 0 5px 0 var(--border); cursor: default; filter: grayscale(1); }
 .mg-adv__label { font-size: 12px; font-weight: 700; color: var(--text); background: color-mix(in srgb, var(--surface) 88%, transparent); padding: 1px 8px; border-radius: 999px; }
-.mg-adv__myo { position: absolute; width: 44px; top: -42px; animation: mg-float 1.6s ease-in-out infinite; }
+.mg-adv__mascot { position: absolute; width: 44px; top: -50px; animation: mg-float 1.6s ease-in-out infinite; }
 .mg-adv__actions { display: flex; flex-direction: column; gap: 10px; max-width: 620px; margin: 14px auto 0; }
 .mg-adv__resume { margin: 0; padding: 8px 12px; border-radius: 12px; background: var(--ok-bg); color: var(--ok); font-weight: 700; font-size: 14px; text-align: center; }
 
@@ -738,7 +762,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .mg-sc-bob, .mg-sc-drift, .mg-sc-spin, .mg-sc-hop, .mg-sc-deal, .mg-sc-belt, .mg-sc-convey, .mg-sc-twinkle, .mg-sc-breathe, .mg-ribbon, .mg-btn--pulse,
-  .mg-hub-hero__myo, .mg-myo__arm--l, .mg-myo__arm--r, .mg-sky__cloud, .mg-adv__myo, .mg-lens__ring, .mg-mode__cards i, .mg-belt__track { animation: none; }
+  .mg-hub-hero__mascot, .mg-dukki__body, .mg-dukki__head, .mg-dukki__arm, .mg-dukki__leg, .mg-sky__cloud, .mg-adv__mascot, .mg-lens__ring, .mg-mode__cards i, .mg-belt__track { animation: none; }
   .mg-pcard, .mg-pmatch { transition: none; animation: none; }
 }
 .mg-crash { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }

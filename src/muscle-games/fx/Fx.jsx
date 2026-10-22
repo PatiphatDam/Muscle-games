@@ -1,7 +1,7 @@
 import { createContext, useContext, useMemo, useRef, useState } from 'react';
 import { isMuted, play, setMuted, vibrate } from './sound.js';
 
-// Game juice shared by every game: confetti, floating points, sound, vibration and Myo's speech.
+// Game juice shared by every game: confetti, floating points, sound, vibration and Dukki's speech.
 const ApiContext = createContext(null);
 const StateContext = createContext(null);
 
@@ -90,42 +90,84 @@ export const useFx = () => useContext(ApiContext);
 export const useFxState = () => useContext(StateContext);
 export const pick = (list) => list[Math.floor(Math.random() * list.length)];
 
-/* ---------- Myo, the muscle-fiber mascot ---------- */
+/* ---------- Dukki, the little skeleton mascot ---------- */
+
+// Mint "night" palette: a dark sea-green silhouette with glowing bones.
+const HALO = 'hsl(165 28% 28%)';
+const BONE = 'hsl(165 30% 94%)';
+const EYE = 'hsl(165 25% 22%)';
+const BLUSH = '#c98aa2';
+// Joints the limbs rotate around (styles.css rotates .mg-dukki__arm / __leg per mood).
+const SHOULDER = { l: [39, 87], r: [81, 87] };
+const HIP = { l: [51, 121], r: [69, 121] };
 
 const MOUTHS = {
-  idle: 'M26 41 Q32 45 38 41',
-  happy: 'M24 39 Q32 48 40 39',
-  sad: 'M26 45 Q32 39 38 45',
+  idle: 'M52 67 Q60 73 68 67',
+  happy: 'M51 66 Q60 75 69 66',
+  sad: 'M52 72 Q60 65 68 72',
 };
 
-export function Myo({ mood = 'idle', className = '', ...svgProps }) {
+const Bone = ({ x1, y1, x2, y2, w }) => <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={BONE} strokeWidth={w} strokeLinecap="round" />;
+
+// One arm or leg: a straight bone hanging down from its joint, with its own bit of silhouette so it moves as one piece.
+function Limb({ part, side, joint: [x, y], length }) {
   return (
-    <svg viewBox="0 0 64 64" className={`mg-myo mg-myo--${mood} ${className}`} aria-hidden="true" {...svgProps}>
-      <ellipse cx="32" cy="60" rx="15" ry="3" fill="#1e1240" opacity=".14" />
-      <g className="mg-myo__body">
-        <g className="mg-myo__arm mg-myo__arm--l">
-          <path d="M14 36 q-9 -1 -8 -12" stroke="#f472b6" strokeWidth="6" fill="none" strokeLinecap="round" />
-          <circle cx="6" cy="22" r="4.5" fill="#f9a8d4" stroke="#be185d" strokeWidth="1.5" />
-        </g>
-        <g className="mg-myo__arm mg-myo__arm--r">
-          <path d="M50 36 q9 -1 8 -12" stroke="#f472b6" strokeWidth="6" fill="none" strokeLinecap="round" />
-          <circle cx="58" cy="22" r="4.5" fill="#f9a8d4" stroke="#be185d" strokeWidth="1.5" />
-        </g>
-        <path d="M14 30 C14 10 50 10 50 30 L50 44 C50 58 14 58 14 44 Z" fill="#f472b6" stroke="#be185d" strokeWidth="2" />
-        {[21, 27, 37, 43].map((x) => (
-          <line key={x} x1={x} y1="20" x2={x} y2="52" stroke="#be185d" strokeWidth="2" opacity=".16" />
+    <g className={`mg-dukki__${part} mg-dukki__${part}--${side}`} style={{ transformOrigin: `${x}px ${y}px` }}>
+      <line x1={x} y1={y} x2={x} y2={y + length} stroke={HALO} strokeWidth="14" strokeLinecap="round" />
+      <Bone x1={x} y1={y + 2} x2={x} y2={y + length} w="4.5" />
+      <circle cx={x - 2.6} cy={y + length} r="2.8" fill={BONE} />
+      <circle cx={x + 2.6} cy={y + length} r="2.8" fill={BONE} />
+      <circle cx={x} cy={y} r="3.4" fill={BONE} />
+    </g>
+  );
+}
+
+export function Dukki({ mood = 'idle', className = '', ...svgProps }) {
+  const wow = mood === 'wow';
+  const sad = mood === 'sad';
+  const eyeY = sad ? 52 : 50;
+  const eye = { rx: wow ? 11 : 9.5, ry: wow ? 12 : sad ? 8.5 : 10.5 };
+  return (
+    <svg viewBox="-6 0 132 150" className={`mg-dukki mg-dukki--${mood} ${className}`} aria-hidden="true" {...svgProps}>
+      <g className="mg-dukki__body">
+        <path
+          d="M60 8 C28 8 14 32 16 56 C17 71 27 79 35 83 L36 116 C36 123 41 126 49 126 L71 126 C79 126 84 123 84 116 L85 83 C93 79 103 71 104 56 C106 32 92 8 60 8Z"
+          fill={HALO}
+        />
+        <Limb part="leg" side="l" joint={HIP.l} length={17} />
+        <Limb part="leg" side="r" joint={HIP.r} length={17} />
+        <Bone x1={57} y1={85} x2={SHOULDER.l[0]} y2={SHOULDER.l[1]} w="4" />
+        <Bone x1={63} y1={85} x2={SHOULDER.r[0]} y2={SHOULDER.r[1]} w="4" />
+        {[92, 100, 108].map((y, k) => (
+          <g key={y}>
+            <Bone x1={57} y1={y} x2={42 + k * 2} y2={y + 3} w="5.5" />
+            <Bone x1={63} y1={y} x2={78 - k * 2} y2={y + 3} w="5.5" />
+          </g>
         ))}
-        <ellipse cx="25" cy="30" rx="4.6" ry="5.6" fill="#fff" />
-        <ellipse cx="39" cy="30" rx="4.6" ry="5.6" fill="#fff" />
-        <circle cx="26" cy="31" r="2.6" fill="#1e1240" />
-        <circle cx="40" cy="31" r="2.6" fill="#1e1240" />
-        <circle cx="19" cy="39" r="3" fill="#fb7185" opacity=".55" />
-        <circle cx="45" cy="39" r="3" fill="#fb7185" opacity=".55" />
-        {mood === 'wow' ? (
-          <ellipse cx="32" cy="43" rx="3.4" ry="4" fill="#7f1d1d" />
-        ) : (
-          <path d={MOUTHS[mood] ?? MOUTHS.idle} stroke="#7f1d1d" strokeWidth="2.4" fill="none" strokeLinecap="round" />
-        )}
+        <rect x="56.5" y="83" width="7" height="34" rx="3.5" fill={BONE} />
+        <path d="M48 117 Q60 128 72 117" fill="none" stroke={BONE} strokeWidth="7" strokeLinecap="round" />
+        <Limb part="arm" side="l" joint={SHOULDER.l} length={19} />
+        <Limb part="arm" side="r" joint={SHOULDER.r} length={19} />
+        <g className="mg-dukki__head">
+          <path d="M60 16 C34 16 22 34 23 52 C24 66 34 72 44 74 L44 80 Q60 88 76 80 L76 74 C86 72 96 66 97 52 C98 34 86 16 60 16Z" fill={BONE} />
+          <ellipse cx="45" cy={eyeY} {...eye} fill={EYE} />
+          <ellipse cx="75" cy={eyeY} {...eye} fill={EYE} />
+          {!sad && (
+            <>
+              <circle cx="48" cy={eyeY - 4} r="2.6" fill="#fff" opacity=".9" />
+              <circle cx="78" cy={eyeY - 4} r="2.6" fill="#fff" opacity=".9" />
+            </>
+          )}
+          {sad && <path d="M37 37 l12 5 M83 37 l-12 5" stroke={EYE} strokeWidth="2.5" strokeLinecap="round" />}
+          <ellipse cx="60" cy="61" rx="3" ry="2.4" fill={EYE} opacity=".55" />
+          <ellipse cx="34" cy="64" rx="6.5" ry="3.6" fill={BLUSH} opacity=".7" />
+          <ellipse cx="86" cy="64" rx="6.5" ry="3.6" fill={BLUSH} opacity=".7" />
+          {wow ? (
+            <ellipse cx="60" cy="69" rx="4.5" ry="5.5" fill={EYE} />
+          ) : (
+            <path d={MOUTHS[mood] ?? MOUTHS.idle} stroke={EYE} strokeWidth="3" fill="none" strokeLinecap="round" />
+          )}
+        </g>
       </g>
     </svg>
   );
@@ -135,7 +177,7 @@ export function MascotBar({ fallback }) {
   const { speech } = useFxState();
   return (
     <div className="mg-mascot-bar">
-      <Myo key={`m${speech.id}`} mood={speech.mood} className="mg-mascot-bar__myo" />
+      <Dukki key={`m${speech.id}`} mood={speech.mood} className="mg-mascot-bar__mascot" />
       <p key={`b${speech.id}`} className="mg-mascot-bar__bubble" role="status" aria-live="polite">
         {speech.text || fallback}
       </p>

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { GAMES, starsFor } from './games/meta.js';
 import { useScores } from './scores.jsx';
 import { BalloonScene, CardTableScene, MicroscopeScene } from './covers.jsx';
-import { Myo } from './fx/Fx.jsx';
+import { Dukki } from './fx/Fx.jsx';
 import { Stars } from './components/Hud.jsx';
 
 const SCENES = { 'balloon-pop': BalloonScene, 'group-sort': CardTableScene, diameter: MicroscopeScene };
@@ -71,12 +71,12 @@ export default function GamesHub() {
   return (
     <main className="mg-page">
       <header className="mg-hub-hero">
-        <Myo mood="happy" className="mg-hub-hero__myo" />
+        <Dukki mood="happy" className="mg-hub-hero__mascot" />
         <div>
           <p className="mg-eyebrow">Muscular Tissues I</p>
           <h1>Games</h1>
           <p className="mg-lede">
-            Hi, I’m <strong>Myo</strong>, a skeletal muscle fiber! Pick a game, beat your best score, collect ⭐ and 🏅. Every
+            Hi, I’m <strong>Dukki</strong>, a little skeleton! Pick a game, beat your best score, collect ⭐ and 🏅. Every
             game is open, so play in any order.
           </p>
         </div>
