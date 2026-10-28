@@ -1,78 +1,102 @@
 import { jigsawPath } from './fx/jigsaw.jsx';
+import { AirshipShapes, WizardShapes } from './art.jsx';
 
 // Animated cartoon scenes for the hub cards.
 // Idle loops run all the time; ".is-preview" on the cover plays a short gameplay preview.
 
-function Balloon({ x, y, color, delay, gold }) {
-  return (
-    <g className="mg-sc-bob" style={{ animationDelay: `${delay}s` }}>
-      <g className={gold ? 'mg-pv-pop' : undefined} style={{ transformOrigin: `${x}px ${y}px` }}>
-        <path d={`M${x} ${y + 26} q-5 16 3 34`} stroke="hsl(165 15% 35%)" strokeWidth="1.4" fill="none" />
-        <ellipse cx={x} cy={y} rx="20" ry="25" fill={color} />
-        <ellipse cx={x - 7} cy={y - 9} rx="5" ry="7" fill="#fff" opacity=".5" />
-        <path d={`M${x - 4} ${y + 24} h8 l-4 5z`} fill={color} />
-        {gold && <text x={x} y={y + 5} textAnchor="middle" fontSize="13">⭐</text>}
-      </g>
-    </g>
-  );
-}
-
-function Cloud({ x, y, s = 1 }) {
-  return (
-    <g transform={`translate(${x} ${y}) scale(${s})`} fill="#fff" opacity=".9">
-      <ellipse cx="0" cy="0" rx="22" ry="12" />
-      <ellipse cx="18" cy="-6" rx="16" ry="12" />
-      <ellipse cx="34" cy="2" rx="16" ry="10" />
-    </g>
-  );
-}
+// Balloon Pop: the hooded sage close up, his orb glowing on the left, goblin balloons over the shadow castle.
+// Preview: the orb turns red, a fireball flies to the near balloon, it bursts and "+30" floats up.
+const BC_SKYLINE =
+  'M0 46h320v24H0z M0 40h8v6H0z M16 40h8v6h-8z M300 40h8v6h-8z M284 40h8v6h-8z ' +
+  'M20 46V22h20v24z M16 22L30 6l14 16z M60 46V16h30v30z M54 16L75 0l21 16z M120 46V6h40v40z M114 8l26-22 26 22z ' +
+  'M178 46v-70h24v70z M172-24l18-32 18 32z M224 46V18h40v28z M218 18l26-20 26 20z M286 46V24h20v22z M282 24l14-16 14 16z';
 
 export function BalloonScene() {
   return (
-    <svg viewBox="0 0 320 200" className="mg-scene" aria-hidden="true">
+    <svg viewBox="0 0 320 200" className="mg-scene mg-bc" aria-hidden="true">
       <defs>
-        <linearGradient id="bs-sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="hsl(195 55% 66%)" />
-          <stop offset=".6" stopColor="hsl(190 55% 86%)" />
-          <stop offset="1" stopColor="hsl(38 60% 93%)" />
+        <linearGradient id="bc-night" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="hsl(245 55% 12%)" />
+          <stop offset=".6" stopColor="hsl(262 48% 24%)" />
+          <stop offset="1" stopColor="hsl(285 40% 34%)" />
+        </linearGradient>
+        <radialGradient id="bc-orb">
+          <stop offset="0" stopColor="#fff" stopOpacity=".95" />
+          <stop offset=".35" stopColor="#ffd9a8" stopOpacity=".55" />
+          <stop offset="1" stopColor="#ff8a3d" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id="bc-red">
+          <stop offset="0" stopColor="#fff2e0" />
+          <stop offset=".3" stopColor="#ff5a3c" stopOpacity=".85" />
+          <stop offset="1" stopColor="#e0322b" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id="bc-fire">
+          <stop offset="0" stopColor="#fff7d6" />
+          <stop offset=".45" stopColor="#ffb020" />
+          <stop offset="1" stopColor="#e0322b" />
+        </radialGradient>
+        <linearGradient id="bc-gold" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#fff3c4" />
+          <stop offset=".45" stopColor="#f6c453" />
+          <stop offset="1" stopColor="#b9771d" />
+        </linearGradient>
+        <linearGradient id="bc-fade" x1="0" y1="0" x2="0" y2="1">
+          <stop offset=".6" stopColor="#0b0820" stopOpacity="0" />
+          <stop offset="1" stopColor="#0b0820" stopOpacity=".6" />
         </linearGradient>
       </defs>
-      <rect width="320" height="200" fill="url(#bs-sky)" />
-      <g className="mg-sc-spin" style={{ transformOrigin: '272px 40px' }}>
-        {Array.from({ length: 10 }, (_, k) => (
-          <line key={k} x1="272" y1="14" x2="272" y2="6" stroke="#fde68a" strokeWidth="3" strokeLinecap="round" transform={`rotate(${k * 36} 272 40)`} />
-        ))}
+      <rect width="320" height="200" fill="url(#bc-night)" />
+      <circle cx="300" cy="22" r="11" fill="#fde68a" opacity=".9" />
+      <g fill="#fff">
+        <circle cx="40" cy="22" r=".9" />
+        <circle cx="170" cy="14" r="1.1" />
+        <circle cx="250" cy="44" r=".8" />
+        <circle cx="90" cy="60" r=".8" />
       </g>
-      <circle cx="272" cy="40" r="17" fill="#fde68a" />
       <g className="mg-sc-drift">
-        <Cloud x={30} y={42} />
+        <path d="M10 66q8-10 18-4q8-8 18 0q10-3 12 6z" fill="hsl(258 28% 40%)" opacity=".55" />
       </g>
-      <g className="mg-sc-drift mg-sc-drift--slow">
-        <Cloud x={170} y={78} s={0.8} />
+      <path d={BC_SKYLINE} transform="translate(0 140)" fill="hsl(258 26% 20%)" opacity=".9" />
+      <g className="mg-pv-pop">
+        <g className="mg-sc-bob" style={{ '--color': '#2fb5a3', '--color-dark': '#1f8577' }}>
+          <g transform="translate(208 16) scale(0.3167)">
+            <AirshipShapes />
+          </g>
+        </g>
       </g>
-      <path d="M0 172 Q80 148 160 170 T320 162 V200 H0Z" fill="hsl(170 45% 45%)" opacity=".45" />
-      <path d="M0 186 Q100 166 200 186 T320 180 V200 H0Z" fill="hsl(165 45% 34%)" opacity=".55" />
-      <Balloon x={78} y={98} color="#5eead4" delay={0} />
-      <Balloon x={128} y={78} color="#f472b6" delay={0.7} />
-      <Balloon x={226} y={100} color="#7dd3fc" delay={1.3} />
-      <Balloon x={176} y={60} color="#fbbf24" delay={0.3} gold />
-      <g className="mg-pv-confetti" style={{ transformOrigin: '176px 60px' }}>
-        {Array.from({ length: 10 }, (_, k) => (
-          <circle key={k} cx={176 + Math.cos(k * 0.63) * 26} cy={60 + Math.sin(k * 0.63) * 26} r="3" fill={['#fbbf24', '#f472b6', 'hsl(170 45% 45%)', '#34d399'][k % 4]} />
+      <g className="mg-sc-bob" style={{ animationDelay: '-1s', '--color': '#ec7fb0', '--color-dark': '#bf5285' }}>
+        <g transform="translate(262 58) scale(0.25)">
+          <AirshipShapes />
+        </g>
+      </g>
+      <g className="mg-pv-confetti" style={{ transformOrigin: '227px 34px' }}>
+        {Array.from({ length: 8 }, (_, k) => (
+          <circle key={k} cx={227 + Math.cos(k * 0.79) * 14} cy={34 + Math.sin(k * 0.79) * 14} r="2.4" fill={['#ffb020', '#fbf1c7', '#2fb5a3', '#ff5a3c'][k % 4]} />
         ))}
       </g>
-      <text className="mg-pv-score" x="196" y="42" fontSize="16" fontWeight="800" fill="#b45309">
-        +30 ×2
+      <text className="mg-pv-score" x="244" y="20" fontFamily="'Cinzel Decorative', Georgia, serif" fontWeight="900" fontSize="12" fill="url(#bc-gold)" stroke="#3a2008" strokeWidth=".6">
+        +30
       </text>
-      <g className="mg-pv-dart">
-        <line x1="160" y1="186" x2="160" y2="166" stroke="hsl(165 45% 15%)" strokeWidth="3" />
-        <path d="M155 168 l5 -10 5 10z" fill="hsl(165 45% 15%)" />
-        <path d="M156 188 l4 -6 4 6z" fill="#f472b6" />
+      {/* warm light from the orb, turning red when he casts */}
+      <circle className="mg-bc-glow" cx="130" cy="72" r="70" fill="url(#bc-orb)" opacity=".75" />
+      <circle className="mg-bc-redglow" cx="130" cy="72" r="70" fill="url(#bc-red)" />
+      {/* the wizard, mirrored so the staff and orb sit on the left, cropped at the chest */}
+      <g transform="translate(276 24) scale(-0.9 0.9)">
+        <WizardShapes />
       </g>
-      <g transform="translate(150 178)">
-        <rect x="-4" y="0" width="28" height="18" rx="6" fill="hsl(165 50% 20%)" />
-        <circle cx="10" cy="0" r="7" fill="hsl(165 52% 32%)" />
+      <g fill="#ffe1b0">
+        <circle className="mg-bc-spark" cx="130" cy="72" r="1.6" style={{ '--dx': '-24px', '--dy': '-30px' }} />
+        <circle className="mg-bc-spark" cx="130" cy="72" r="1.2" style={{ '--dx': '22px', '--dy': '-26px', animationDelay: '-0.8s' }} />
+        <circle className="mg-bc-spark" cx="130" cy="72" r="1.4" style={{ '--dx': '-30px', '--dy': '8px', animationDelay: '-1.5s' }} />
       </g>
+      <circle className="mg-bc-fire" cx="130" cy="72" r="5" fill="url(#bc-fire)" />
+      <rect width="320" height="200" fill="url(#bc-fade)" />
+      <text x="14" y="172" fontFamily="'Cinzel Decorative', Georgia, serif" fontWeight="900" fontSize="27" fill="url(#bc-gold)" stroke="#2a1606" strokeWidth="1.1" paintOrder="stroke">
+        Balloon
+      </text>
+      <text x="16" y="192" fontFamily="'Cinzel Decorative', Georgia, serif" fontWeight="700" fontSize="15" letterSpacing="6" fill="url(#bc-gold)" stroke="#2a1606" strokeWidth=".9" paintOrder="stroke">
+        POP
+      </text>
     </svg>
   );
 }

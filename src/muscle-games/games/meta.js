@@ -2,13 +2,13 @@ export const GAMES = [
   {
     id: 'balloon-pop',
     title: 'Balloon Pop',
-    goal: 'Fire darts at the balloon that matches each muscle function or property before it floats away.',
+    goal: 'Help the wizard zap the balloon that matches each muscle function or property before it reaches the castle.',
     lo: 'OL1',
     loText: 'Explain the major functions and physiological properties of muscular tissue',
     minutes: '2–3 min',
     badge: 'HOT',
     keys: ['balloon-pop'],
-    intro: 'Shoot the balloon that matches the clue! Golden balloons score ×2, but watch out for bombs 💣',
+    intro: 'Tap the balloon that matches the clue and the wizard zaps it! Golden balloons score ×2, but watch out for bombs 💣',
     achievements: [
       { id: 'perfect', icon: '🎯', name: 'Sharpshooter', desc: 'Answer all 10 clues without a single miss', test: (s) => s.perfect },
       { id: 'combo5', icon: '🔥', name: 'Combo ×5', desc: 'Get 8 answers right in a row', test: (s) => s.maxStreak >= 8 },

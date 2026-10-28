@@ -1,5 +1,5 @@
 /* Fonts of the Digital Muscle site (Coastal Soft): Nunito Sans text, Playfair Display headings, Noto Sans Thai for Thai. */
-@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400..800&family=Playfair+Display:wght@600..800&family=Noto+Sans+Thai:wght@400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400..800&family=Playfair+Display:wght@600..800&family=Noto+Sans+Thai:wght@400..700&family=Cinzel+Decorative:wght@700;900&display=swap');
 
 /*
  * Theme = the Digital Muscle site's "Coastal Soft" Games colours (sea green, hue 165).
@@ -177,7 +177,7 @@
 }
 .mg-btn:active { transform: scale(0.97); }
 .mg-btn:focus-visible, .mg-bin:focus-visible, .mg-piece:focus-visible, .mg-row:focus-visible, .mg-board:focus-visible,
-.mg-balloon:focus-visible, .mg-mcard:focus-visible, .mg-mode:focus-visible, .mg-belt-card:focus-visible, .mg-adv__btn:focus-visible, .mg-preview-chip:focus-visible {
+.mg-mcard:focus-visible, .mg-mode:focus-visible, .mg-belt-card:focus-visible, .mg-adv__btn:focus-visible, .mg-preview-chip:focus-visible {
   outline: 3px solid var(--sea-500); outline-offset: 2px;
 }
 .mg-btn--primary { background: var(--sea-600); color: var(--on-accent); box-shadow: var(--shadow); }
@@ -320,6 +320,22 @@
 @keyframes mg-pv-back { 0%, 12% { transform: scaleX(1); } 22%, 78% { transform: scaleX(0); } 88%, 100% { transform: scaleX(1); } }
 @keyframes mg-pv-face { 0%, 22% { transform: scaleX(0); } 32%, 70% { transform: scaleX(1); } 78%, 100% { transform: scaleX(0); } }
 @keyframes mg-pv-sparkle { 0%, 35% { opacity: 0; } 45% { opacity: 1; } 70%, 100% { opacity: 0; } }
+
+/* Balloon Pop cover: the orb glows and throws sparks; in preview it turns red and fires at the near balloon,
+   timed to the shared 2.4s pop/confetti/score loop. */
+/* placed art (wizard, balloons) and its inner details keep plain SVG transforms, not the scene-wide fill-box */
+.mg-bc [transform] { transform-box: view-box; transform-origin: 0 0; }
+.mg-bc-glow { animation: mg-bc-glow 2.4s ease-in-out infinite; transform-origin: center; }
+@keyframes mg-bc-glow { 50% { opacity: 0.55; transform: scale(1.12); } }
+.mg-bc-spark { animation: mg-bc-spark 2.2s ease-in-out infinite; }
+@keyframes mg-bc-spark { 0%, 100% { opacity: 0; transform: translate(0, 0); } 30% { opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)); } }
+.mg-bc-redglow, .mg-bc-fire { opacity: 0; }
+.mg-is-preview .mg-bc-redglow { animation: mg-bc-red 2.4s ease-out infinite; }
+.mg-is-preview .mg-bc .mg-wizard__orb { animation: mg-bc-orb 2.4s ease-out infinite; }
+.mg-is-preview .mg-bc-fire { animation: mg-bc-fire 2.4s ease-in infinite; }
+@keyframes mg-bc-red { 0%, 2% { opacity: 0; } 6%, 26% { opacity: 1; } 36%, 100% { opacity: 0; } }
+@keyframes mg-bc-orb { 0%, 2% { fill: #fff; } 6%, 26% { fill: #e0322b; } 36%, 100% { fill: #fff; } }
+@keyframes mg-bc-fire { 0%, 8% { opacity: 0; transform: translate(0, 0); } 10% { opacity: 1; } 28% { opacity: 1; transform: translate(97px, -38px); } 30%, 100% { opacity: 0; transform: translate(97px, -38px); } }
 @keyframes mg-pv-zoom { 0%, 100% { transform: scale(1); } 35%, 65% { transform: scale(1.45); } }
 @keyframes mg-pv-snap { 0%, 30% { opacity: 1; transform: translate(0, 0); } 55%, 80% { opacity: 1; transform: translate(-118px, -58px); } 90%, 100% { opacity: 0; transform: translate(-118px, -58px); } }
 
@@ -441,77 +457,150 @@
 .mg-prompt__text { font-size: clamp(17px, 2.6vw, 21px); font-weight: 500; line-height: 1.4; animation: mg-bubble 0.3s ease-out; }
 
 .mg-sky {
-  position: relative; overflow: hidden; border-radius: 22px; height: min(60vh, 520px); min-height: 420px;
-  background: linear-gradient(hsl(200 60% 72%) 0%, hsl(190 55% 86%) 50%, hsl(38 60% 93%) 100%); border: 1px solid var(--border);
+  position: relative; overflow: hidden; border-radius: 22px; height: min(62vh, 540px); min-height: 440px;
+  background:
+    radial-gradient(1.5px 1.5px at 12% 18%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 28% 42%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 46% 12%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 63% 33%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 82% 22%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 91% 52%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 7% 60%, #fff 50%, transparent 51%), radial-gradient(1.5px 1.5px at 38% 66%, #fff 50%, transparent 51%),
+    linear-gradient(hsl(245 55% 16%) 0%, hsl(255 50% 28%) 45%, hsl(275 45% 38%) 80%, hsl(290 40% 44%) 100%);
+  border: 1px solid var(--border);
   transition: filter 0.3s;
 }
-.mg-sky::after {
-  content: ''; position: absolute; inset: auto 0 0; height: 64px; pointer-events: none;
-  background: radial-gradient(120% 100% at 50% 100%, hsl(165 45% 34%) 0 40%, transparent 41%), radial-gradient(80% 90% at 10% 100%, hsl(170 45% 45%) 0 45%, transparent 46%);
-  opacity: 0.55;
-}
 .mg-sky--frozen { filter: hue-rotate(-40deg) saturate(1.3); box-shadow: inset 0 0 0 4px #bae6fd, inset 0 0 40px #e0f2fe; }
-.mg-sky__cloud { position: absolute; width: 120px; height: 36px; border-radius: 40px; background: #fff; opacity: 0.85; animation: mg-cloud 22s linear infinite; }
-.mg-sky__cloud::before, .mg-sky__cloud::after { content: ''; position: absolute; background: #fff; border-radius: 50%; }
-.mg-sky__cloud::before { width: 54px; height: 54px; left: 18px; top: -26px; }
-.mg-sky__cloud::after { width: 40px; height: 40px; left: 60px; top: -16px; }
-.mg-sky__cloud--a { top: 12%; left: -130px; }
-.mg-sky__cloud--b { top: 38%; left: -130px; animation-duration: 30s; animation-delay: -12s; transform: scale(0.7); }
-@keyframes mg-cloud { to { left: 110%; } }
+.mg-sky__moon { position: absolute; top: 18px; right: 22px; width: 54px; height: 54px; border-radius: 50%; background: radial-gradient(circle at 38% 36%, #fffbeb, #fde68a 70%); box-shadow: 0 0 30px rgba(253, 230, 138, 0.55); }
+/* Clouds drift in a band just above the castle's rooftops. They pass over the castle, town and wizard
+   (z-index 4) but stay under the balloons (5), the wizard (6) and his wall (7), the ATP button and the fireballs (8). */
+.mg-clouds { position: absolute; left: 0; right: 0; bottom: calc(50px + min(60cqh, 70cqw) * 0.92); height: 20cqh; z-index: 4; pointer-events: none; }
+.mg-root .mg-cloud { position: absolute; left: 0; height: auto; max-width: none; opacity: 0.62; animation: mg-cloud-drift linear infinite; will-change: transform; }
+@keyframes mg-cloud-drift { from { transform: translateX(-110%); } to { transform: translateX(calc(100cqw + 10px)); } }
+.mg-cloud__shadow { fill: hsl(248 32% 30%); }
+.mg-cloud__body { fill: hsl(258 28% 40%); }
+.mg-cloud__lit { fill: #f2d3dc; }
+.mg-cloud__line { fill: none; stroke: hsl(248 34% 24%); stroke-width: 1.6; opacity: 0.5; }
+/* Reduced motion: hold the clouds where they are (spread out) rather than resetting them all to the left edge. */
+@media (prefers-reduced-motion: reduce) { .mg-root .mg-cloud { animation-play-state: paused; } }
 .mg-sky__balloons { position: absolute; inset: 0; }
-.mg-balloon {
-  position: absolute; top: 100%; z-index: 2;
-  width: min(22%, 150px); left: calc(var(--lane) * 25% + 12.5% - min(11%, 75px));
-  aspect-ratio: 5 / 6; min-height: 88px; display: grid; place-items: center; padding: 8px;
-  border: 0; cursor: crosshair; touch-action: manipulation;
-  border-radius: 50% 50% 48% 48% / 56% 56% 44% 44%;
-  background: radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.7) 0 11%, transparent 12%), var(--color);
-  box-shadow: inset -8px -10px 0 rgba(0, 0, 0, 0.1);
-  animation: mg-rise var(--dur) linear var(--delay) forwards;
+
+/* A falling hot-air balloon with a goblin in the basket; the answer hangs on a sign below the basket. */
+.mg-rider {
+  position: absolute; top: -45%; z-index: 5;
+  width: min(23%, 150px); left: calc(var(--lane) * 25% + 1%);
+  display: flex; flex-direction: column; align-items: center;
+  padding: 0; border: 0; background: none; color: inherit; font: inherit; cursor: crosshair; touch-action: manipulation;
+  animation: mg-fall var(--dur) linear var(--delay) forwards;
 }
-.mg-balloon::before { content: ''; position: absolute; left: 50%; bottom: -6px; width: 12px; height: 10px; margin-left: -6px; background: var(--color); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
-.mg-balloon::after { content: ''; position: absolute; left: 50%; top: 100%; width: 2px; height: 46px; background: hsl(165 15% 35%); opacity: 0.55; }
-.mg-balloon span { font-size: clamp(11px, 2.3vw, 15px); font-weight: 700; line-height: 1.2; color: hsl(165 40% 12%); text-align: center; overflow-wrap: anywhere; }
-.mg-balloon--gold {
-  --color: #fbbf24;
-  background: radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.85) 0 11%, transparent 12%), linear-gradient(135deg, #fde68a, #f59e0b 60%, #d97706);
-  box-shadow: inset -8px -10px 0 rgba(0, 0, 0, 0.1), 0 0 18px rgba(251, 191, 36, 0.8);
+.mg-rider__balloon { position: relative; display: block; width: min(100%, 80px); aspect-ratio: 120 / 172; transition: filter 0.15s; }
+.mg-root .mg-rider__balloon .mg-air { display: block; width: 100%; height: 100%; overflow: visible; }
+.mg-air__fabric { fill: var(--color); }
+.mg-air__shade { fill: var(--color-dark); opacity: 0.28; }
+.mg-air__edge { fill: none; stroke: var(--color-dark); stroke-width: 1.6; }
+.mg-air__mouth { fill: var(--color-dark); }
+/* the sign is tied under the basket: it overlaps the basket's foot and is a little narrower than the balloon */
+.mg-rider__banner {
+  position: relative; width: 100%; max-width: 110px; margin-top: -8px; padding: 4px 3px; border-radius: 6px; border: 2px solid hsl(35 45% 40%);
+  background: linear-gradient(hsl(42 80% 92%), hsl(38 65% 82%)); box-shadow: 0 2px 0 hsl(30 40% 30%);
+  font-size: clamp(9.5px, 2.4vw, 14px); font-weight: 800; line-height: 1.15; color: hsl(25 50% 16%); text-align: center;
+  /* long words break at a syllable with a hyphen rather than mid-letter */
+  hyphens: auto; overflow-wrap: break-word;
 }
-.mg-balloon__star { position: absolute; top: -10px; right: -4px; font-size: 20px; animation: mg-twinkle-b 1.2s ease-in-out infinite; }
+.mg-rider--gold { --color: #f5c542; --color-dark: #b8860b; }
+.mg-rider--gold .mg-rider__balloon { filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.85)); }
+.mg-rider__star { position: absolute; top: -6px; right: -4px; font-size: 20px; animation: mg-twinkle-b 1.2s ease-in-out infinite; }
 @keyframes mg-twinkle-b { 50% { transform: scale(1.3) rotate(20deg); } }
-.mg-balloon--aim { outline: 3px dashed rgba(255, 255, 255, 0.9); outline-offset: 3px; }
-.mg-balloon--good { animation: mg-rise var(--dur) linear var(--delay) forwards, mg-burst 0.3s ease-out forwards; animation-play-state: paused, running; }
-.mg-balloon--bad { animation: mg-rise var(--dur) linear var(--delay) forwards, mg-fizzle 0.4s ease-out forwards; animation-play-state: paused, running; }
-.mg-balloon--gone { animation: mg-rise var(--dur) linear var(--delay) forwards, mg-gone 0.5s ease-out forwards; }
-.mg-balloon:disabled { cursor: default; }
-@keyframes mg-rise { from { top: 100%; } to { top: -45%; } }
+.mg-rider--aim .mg-rider__balloon { filter: drop-shadow(0 0 6px #fff) drop-shadow(0 0 2px #fff); }
+.mg-rider--good { animation: mg-fall var(--dur) linear var(--delay) forwards, mg-burst 0.3s ease-out forwards; animation-play-state: paused, running; }
+.mg-rider--bad { animation: mg-fall var(--dur) linear var(--delay) forwards, mg-fizzle 0.4s ease-out forwards; animation-play-state: paused, running; }
+.mg-rider--gone { animation: mg-fall var(--dur) linear var(--delay) forwards, mg-gone 0.5s ease-out forwards; }
+.mg-rider:disabled { cursor: default; }
+.mg-rider:focus-visible .mg-rider__balloon { outline: 3px solid #fde68a; outline-offset: 2px; border-radius: 12px; }
+@keyframes mg-fall { from { top: -45%; } to { top: 100%; } }
 @keyframes mg-burst { 50% { transform: scale(1.4); opacity: 0.8; } to { transform: scale(1.7); opacity: 0; } }
 @keyframes mg-fizzle { 30% { transform: translateX(-8px) rotate(-8deg); } 60% { transform: translateX(8px) rotate(8deg); } to { transform: scale(0.3); opacity: 0; filter: grayscale(1); } }
 @keyframes mg-gone { to { opacity: 0; transform: scale(0.5); filter: grayscale(1); } }
 
 .mg-flyer {
-  position: absolute; left: -80px; z-index: 3; width: 62px; height: 62px; border: 0; border-radius: 50%; cursor: crosshair;
+  position: absolute; left: -80px; z-index: 5; width: 62px; height: 62px; border: 0; border-radius: 50%; cursor: crosshair;
   display: grid; place-items: center; font-size: 30px; touch-action: manipulation;
   animation: mg-fly 5.5s linear var(--fdelay) forwards;
 }
 .mg-flyer--rev { animation-direction: reverse; animation-fill-mode: both; }
 .mg-flyer--ice { background: radial-gradient(circle at 35% 30%, #fff 0 15%, #bae6fd 16% 60%, #7dd3fc); box-shadow: 0 0 16px #7dd3fc; }
-.mg-flyer--bomb { background: radial-gradient(circle at 35% 30%, #6b7280 0 15%, #1f2937 16%); box-shadow: 0 0 14px rgba(239, 68, 68, 0.7); }
+.mg-flyer--bomb { background: radial-gradient(circle at 35% 30%, #6b7280 0 15%, #1f2937 16%); box-shadow: 0 0 14px rgba(239, 68, 68, 0.8); }
 @keyframes mg-fly { 0% { left: -80px; transform: translateY(0); } 25% { transform: translateY(-14px); } 50% { transform: translateY(8px); } 75% { transform: translateY(-10px); } 100% { left: calc(100% + 20px); transform: translateY(0); } }
 
-.mg-launcher {
-  position: absolute; left: 50%; bottom: 14px; z-index: 4; width: 44px; height: 44px; border-radius: 50%;
-  background: radial-gradient(circle at 40% 35%, hsl(165 40% 55%), hsl(165 55% 24%)); border: 3px solid #fff; box-shadow: 0 4px 10px rgb(10 40 32 / 0.4);
-  transform: translateX(-50%); transform-origin: 50% 50%; transition: transform 0.12s;
+/* Castle backdrop: a far, faded layer (mirrored) behind a near shadow layer. */
+/* Sized by height so the castle and the town strip share one scale (110/290 of the castle's height). */
+/* The sky is the size container, so the castle can be capped by both its height and its width (never cropped on phones). */
+.mg-sky { container-type: size; }
+.mg-root .mg-backdrop {
+  --bd-h: min(60cqh, 70cqw);
+  position: absolute; left: 50%; bottom: 50px; height: var(--bd-h); width: auto; aspect-ratio: 400 / 290; max-width: none;
+  transform: translateX(-50%); pointer-events: none;
 }
-.mg-launcher__dart { position: absolute; left: 50%; top: -16px; width: 4px; height: 26px; margin-left: -2px; background: hsl(165 45% 15%); border-radius: 2px; }
-.mg-launcher__dart::before { content: ''; position: absolute; left: -5px; top: -8px; border: 7px solid transparent; border-bottom: 10px solid hsl(165 45% 15%); border-top: 0; }
-.mg-dart { position: absolute; left: -2px; top: -14px; z-index: 5; width: 4px; height: 28px; background: hsl(165 45% 15%); border-radius: 2px; pointer-events: none; }
-.mg-dart::before { content: ''; position: absolute; left: -5px; top: -8px; border: 7px solid transparent; border-bottom: 10px solid hsl(165 45% 15%); border-top: 0; }
-.mg-dart::after { content: ''; position: absolute; left: -4px; bottom: -2px; width: 12px; height: 8px; background: var(--pink); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.mg-root .mg-backdrop--far { --bd-h: min(48cqh, 56cqw); bottom: 84px; opacity: 0.45; transform: translateX(-50%) scaleX(-1); }
+.mg-town { --bd-h: min(60cqh, 70cqw); position: absolute; inset: auto 0 50px; height: calc(var(--bd-h) * 110 / 290); background: center bottom / auto 100% repeat-x; pointer-events: none; }
+.mg-town--far { --bd-h: min(48cqh, 56cqw); bottom: 84px; opacity: 0.45; transform: scaleX(-1); }
+.mg-backdrop {
+  --bd-body: hsl(258 26% 24%); --bd-roof: hsl(258 26% 20%); --bd-rock: #2b243f; --bd-dark: hsl(256 30% 13%);
+  --bd-window: hsl(256 34% 10%); --bd-line: hsl(258 22% 31%); --bd-tree: hsl(250 28% 14%); --bd-tree-lit: hsl(250 24% 18%);
+  --bd-moss: hsl(150 14% 25% / 0.75);
+}
+.mg-backdrop--far {
+  --bd-body: hsl(270 22% 40%); --bd-roof: hsl(270 22% 37%); --bd-rock: #5c4870; --bd-dark: hsl(270 22% 32%);
+  --bd-window: hsl(270 24% 30%); --bd-line: hsl(270 20% 46%); --bd-tree: hsl(262 22% 33%); --bd-tree-lit: hsl(262 20% 37%);
+  --bd-moss: hsl(220 14% 42% / 0.6);
+}
+.mg-bd-body { fill: var(--bd-body); } .mg-bd-roof { fill: var(--bd-roof); } .mg-bd-rock { fill: var(--bd-rock); }
+.mg-bd-dark { fill: var(--bd-dark); } .mg-bd-window { fill: var(--bd-window); } .mg-bd-moss { fill: var(--bd-moss); }
+.mg-bd-tree { fill: var(--bd-tree); } .mg-bd-tree-lit { fill: var(--bd-tree-lit); }
+.mg-bd-trunk { fill: none; stroke: var(--bd-tree); stroke-width: 5; stroke-linecap: round; }
+.mg-bd-line { fill: none; stroke: var(--bd-line); stroke-width: 1.2; stroke-linecap: round; }
+.mg-bd-timber { fill: none; stroke: var(--bd-dark); stroke-width: 1.8; }
+.mg-sky__haze { position: absolute; inset: auto 0 50px; height: 60px; pointer-events: none; background: linear-gradient(transparent, hsl(285 38% 42% / 0.5)); }
+
+/* Stone wall in front of the wizard: coursed blocks with staggered joints, a coping course and capped merlons. */
+.mg-castle {
+  position: absolute; inset: auto 0 0; height: 66px; z-index: 7; pointer-events: none;
+  /* Merlons are phased so one ends exactly at each side of the wizard's opening (50% − 62px … 50% + 38px). */
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='42' height='16'%3E%3Cpath d='M0 0h26v16H0z' fill='%234a4263'/%3E%3Cpath d='M0 0h26v3H0z' fill='%23605880'/%3E%3Cpath d='M13.5 3v13M0 9.5h26' stroke='%23574f74' fill='none'/%3E%3C/svg%3E") calc(50% - 67px) 0 / 42px 16px repeat-x;
+  /* Leave an opening in the battlements where the wizard stands, so no merlon cuts across him. */
+  -webkit-mask: linear-gradient(#000 0 0) 0 16px / 100% 100% no-repeat, linear-gradient(#000 0 0) left top / calc(50% - 62px) 16px no-repeat, linear-gradient(#000 0 0) right top / calc(50% - 38px) 16px no-repeat;
+  mask: linear-gradient(#000 0 0) 0 16px / 100% 100% no-repeat, linear-gradient(#000 0 0) left top / calc(50% - 62px) 16px no-repeat, linear-gradient(#000 0 0) right top / calc(50% - 38px) 16px no-repeat;
+}
+.mg-castle::before {
+  content: ''; position: absolute; inset: 16px 0 0;
+  background:
+    linear-gradient(hsl(255 18% 40%), hsl(255 18% 40%)) 0 0 / 100% 3px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='24'%3E%3Cpath d='M0 .5H48M0 12.5H48M.5 0V12M24.5 12V24' stroke='%23574f74' fill='none'/%3E%3Cpath d='M1 1h22v2H1zM25 13h22v2H25zM1 13h22v2H1zM25 1h22v2H25z' fill='%23ffffff' fill-opacity='.04'/%3E%3C/svg%3E") 0 3px / 48px 24px,
+    linear-gradient(hsl(255 20% 30%), hsl(255 22% 22%));
+}
+.mg-wizard {
+  position: absolute; left: 50%; bottom: 8px; z-index: 6; width: 110px; height: 143px; pointer-events: none;
+  transform: translateX(-62%); filter: drop-shadow(0 0 8px rgba(196, 181, 253, 0.45));
+}
+.mg-root .mg-wizard svg { width: 100%; height: 100%; overflow: visible; }
+.mg-wizard__arm { transform-box: view-box; transform-origin: 160px 170px; }
+.mg-wizard__glow { transform-box: fill-box; transform-origin: center; }
+/* Cast: raise the staff high, then swing it forward; only the orb flashes red. */
+.mg-wizard--cast .mg-wizard__arm { animation: mg-staff-swing 0.45s ease-out; }
+.mg-wizard--cast .mg-wizard__orb { animation: mg-orb-red 0.45s ease-out; }
+.mg-wizard--cast .mg-wizard__glow { animation: mg-orb-aura 0.45s ease-out; }
+@keyframes mg-staff-swing { 20% { transform: translateY(-40px) rotate(10deg); } 40% { transform: translateY(-26px) rotate(-26deg); } }
+@keyframes mg-orb-red { 8%, 70% { fill: #e0322b; } }
+@keyframes mg-orb-aura { 20%, 45% { fill: #e0322b; opacity: 0.45; transform: scale(1.5); } }
+.mg-fireball {
+  position: absolute; left: -5px; top: -5px; z-index: 8; width: 10px; height: 10px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, #fff7d6 0 25%, #ffb020 45%, #e0322b 75%); box-shadow: 0 0 10px #ff6a2b, 0 0 18px #e0322b;
+}
+.mg-ember {
+  position: absolute; left: -2px; top: -2px; z-index: 8; width: 4px; height: 4px; border-radius: 50%; pointer-events: none;
+  background: #ffb020; box-shadow: 0 0 6px #e0322b; animation: mg-ember 0.45s ease-out forwards;
+}
+@keyframes mg-ember { to { opacity: 0; translate: 0 10px; scale: 0.3; } }
 
 .mg-atp {
-  position: absolute; left: 10px; bottom: 10px; z-index: 4; display: flex; align-items: center; gap: 6px;
+  position: absolute; left: 10px; bottom: 10px; z-index: 8; display: flex; align-items: center; gap: 6px;
   min-height: 48px; padding: 6px 12px 6px 8px; border-radius: 14px; border: 2px solid #fff;
   background: hsl(165 45% 14% / 0.78); color: #fff; font-weight: 800; cursor: pointer;
 }
@@ -519,7 +608,7 @@
 .mg-atp__icon { font-size: 20px; }
 .mg-atp__cells { display: flex; gap: 3px; }
 .mg-atp__cells i { width: 10px; height: 18px; border-radius: 3px; background: rgba(255, 255, 255, 0.25); }
-.mg-atp__cells i.on { background: #facc15; box-shadow: 0 0 6px #facc15; }
+.mg-atp__cells i.mg-on { background: #facc15; box-shadow: 0 0 6px #facc15; }
 .mg-atp__label { font-size: 12px; letter-spacing: 0.06em; }
 .mg-atp--ready { background: linear-gradient(90deg, #f59e0b, #facc15); color: #451a03; animation: mg-pulse-gold 1s ease-in-out infinite; }
 @keyframes mg-pulse-gold { 50% { box-shadow: 0 0 0 8px rgba(250, 204, 21, 0.3); transform: scale(1.05); } }
@@ -761,8 +850,8 @@
 @keyframes mg-pop-in { from { transform: scale(0.85); opacity: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .mg-sc-bob, .mg-sc-drift, .mg-sc-spin, .mg-sc-hop, .mg-sc-deal, .mg-sc-belt, .mg-sc-convey, .mg-sc-twinkle, .mg-sc-breathe, .mg-ribbon, .mg-btn--pulse,
-  .mg-hub-hero__mascot, .mg-armin__body, .mg-armin__head, .mg-armin__arm, .mg-armin__leg, .mg-sky__cloud, .mg-adv__mascot, .mg-lens__ring, .mg-mode__cards i, .mg-belt__track { animation: none; }
+  .mg-sc-bob, .mg-bc-glow, .mg-bc-spark, .mg-sc-drift, .mg-sc-spin, .mg-sc-hop, .mg-sc-deal, .mg-sc-belt, .mg-sc-convey, .mg-sc-twinkle, .mg-sc-breathe, .mg-ribbon, .mg-btn--pulse,
+  .mg-hub-hero__mascot, .mg-armin__body, .mg-armin__head, .mg-armin__arm, .mg-armin__leg, .mg-rider__star, .mg-adv__mascot, .mg-lens__ring, .mg-mode__cards i, .mg-belt__track { animation: none; }
   .mg-pcard, .mg-pmatch { transition: none; animation: none; }
 }
 .mg-crash { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
