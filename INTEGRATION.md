@@ -55,6 +55,8 @@ Resulting URLs:
 |---|---|---|
 | `onGameFinish` | `(run) => void \| Promise` | Called every time a run ends; use it to save the score to the database (GAME-7) |
 | `className` | `string` | Extra class on the `.mg-root` wrapper |
+| `hubTitle` | `boolean` (default `true`) | `false` hides the hub's own "Muscular Tissues I / Games" heading, for a host that renders its own page header (breadcrumb + back button) above the hub |
+| CSS `--mg-bottom-inset` | length (default `0px`) | Set on `.mg-root` (e.g. through `className`) to the height of a fixed bottom tab bar, so the sticky piece tray on phones stays above it |
 
 The `run` object:
 
