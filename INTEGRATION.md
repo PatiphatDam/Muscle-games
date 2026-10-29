@@ -66,12 +66,10 @@ The `run` object:
   gameId: 'group-sort',          // 'balloon-pop' | 'group-sort' | 'diameter'
   mode: 'memory',                // group-sort only: 'memory' | 'conveyor'; null for the other games
   scoreKey: 'group-sort:memory',
-  score: 413,
-  stars: 3,                      // 0–3
+  score: 8.3,                    // out of 10, one decimal: the share of answers that were right (see below)
+  maxScore: 10,
   completed: true,               // false = the player left (← Games / ↻) before the end with some progress (Diameter); the score so far is saved
   isNewBest: true,               // best in this browser session?
-  achievements: ['mem_fast', 'stars3'],
-  newAchievements: ['stars3'],
   mistakes: [{ prompt, yours, answer, why }],   // missed questions (useful for learning analytics)
   summary: '18/18 pairs · 0 wrong · time bonus +170',
   finishedAt: '2026-10-17T09:30:00.000Z'
@@ -114,12 +112,17 @@ Change the theme colours by overriding the CSS variables on `.mg-root`, for exam
 | Balloon Pop — clues and choices | `games/BalloonPop.jsx` (`CLUES`, `PROPERTIES`, `FUNCTIONS`) |
 | Group Sort — conveyor cards / picture pairs | `games/sort/data.js` |
 | Diameter — all 6 stages | `games/diameter/levels.js` |
-| Game names, OL, play time, achievements, star thresholds | `games/meta.js` |
+| Game names, OL, play time, the out-of-10 scoring helper | `games/meta.js` |
 
 ## 6. Behaviour to know about
 
 - **Diameter** remembers cleared stages in `sessionStorage`: press ← Games, come back, and it resumes at the next stage (press ↻ to start over).
-- **Best scores and badges** are kept in that tab's `sessionStorage` only (gone when the tab closes). Save permanently through `onGameFinish`.
+- **Scoring:** every game is worth 10 points, and a student's collected score for a game is their best run (Group Sort: best of either mode).
+  - Balloon Pop: clues answered right on the first try, out of 10.
+  - Picture Match: pairs found ÷ (18 pairs + wrong matches) × 10.
+  - Conveyor Sort: crates packed right ÷ (packed + wrong bin + fell off) × 10.
+  - Diameter: right drops ÷ (every piece of all 6 stages + wrong drops) × 10; stages not played count against the score.
+- **Best scores** are kept in that tab's `sessionStorage` only (gone when the tab closes). Save permanently through `onGameFinish`.
 - **Sound** is generated with Web Audio (no audio files). Players can mute with the 🔊 button; the setting is kept in `localStorage`.
 - **Drag and drop** uses Pointer Events, so it works with mouse and touch, plus a "tap a piece → tap a slot" mode for players who can't drag or use a keyboard.
 - **Buttons / tap targets** are ≥ 44px and respect `prefers-reduced-motion`.
@@ -147,7 +150,7 @@ src/muscle-games/
 ├── GamesHub.jsx          ← games hub
 ├── covers.jsx, art.jsx   ← cover scenes and illustrations (SVG)
 ├── scores.jsx, config.js
-├── components/           ← GamePage (game frame / results), Hud (timer, combo, stars)
+├── components/           ← GamePage (game frame / results), Hud (timer, lives)
 ├── fx/                   ← sound, confetti, the Armin mascot, drag and drop, jigsaw
 └── games/                ← BalloonPop, GroupSort (+sort/), diameter/, meta.js
 ```
