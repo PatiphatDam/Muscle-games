@@ -1,6 +1,11 @@
 /* Fonts for the standalone hosts (dev demo, GitHub Pages, share build).
- * Kept out of src/muscle-games on purpose: the main site's Content Security Policy blocks Google Fonts,
- * so it self-hosts the same families instead (see INTEGRATION.md).
- * Nunito Sans text, Playfair Display headings, Noto Sans Thai for Thai,
+ * Same self-hosted @fontsource packages as the main site, so the games look identical in both
+ * and nothing is loaded from Google (the main site's CSP blocks it).
+ * Nunito Sans text, Playfair Display headings, Inter fallback (the main site's body font),
  * Cinzel Decorative and Bungee only for the Balloon Pop and Conveyor Sort cover titles. */
-@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400..800&family=Playfair+Display:wght@600..800&family=Noto+Sans+Thai:wght@400..700&family=Cinzel+Decorative:wght@700;900&family=Bungee&display=swap');
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/nunito-sans';
+@import '@fontsource-variable/playfair-display';
+@import '@fontsource/bungee/latin-400.css';
+@import '@fontsource/cinzel-decorative/latin-700.css';
+@import '@fontsource/cinzel-decorative/latin-900.css';
