@@ -1,5 +1,7 @@
 /* Deliberately "hostile" host styles to prove the games module is isolated. */
 body { margin: 0; font-family: Georgia, serif; background: #f3f4f6; color: #111827; }
+/* Match the games' dark page so short screens don't show a light strip under them. */
+@media (prefers-color-scheme: dark) { body { background: hsl(205 30% 9%); } }
 h1 { font-size: 40px; color: #b91c1c; text-transform: uppercase; }
 button { background: #ef4444; border-radius: 0; padding: 20px; }
 ul { list-style: square; padding-left: 40px; }

@@ -1,5 +1,6 @@
-/* Fonts of the Digital Muscle site (Coastal Soft): Nunito Sans text, Playfair Display headings, Noto Sans Thai for Thai. */
-@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400..800&family=Playfair+Display:wght@600..800&family=Noto+Sans+Thai:wght@400..700&family=Cinzel+Decorative:wght@700;900&display=swap');
+/* Fonts of the Digital Muscle site (Coastal Soft): Nunito Sans text, Playfair Display headings, Noto Sans Thai for Thai.
+   Cinzel Decorative and Bungee are only for the Balloon Pop and Conveyor Sort cover titles. */
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400..800&family=Playfair+Display:wght@600..800&family=Noto+Sans+Thai:wght@400..700&family=Cinzel+Decorative:wght@700;900&family=Bungee&display=swap');
 
 /*
  * Theme = the Digital Muscle site's "Coastal Soft" Games colours (sea green, hue 165).
@@ -177,7 +178,7 @@
 }
 .mg-btn:active { transform: scale(0.97); }
 .mg-btn:focus-visible, .mg-bin:focus-visible, .mg-piece:focus-visible, .mg-row:focus-visible, .mg-board:focus-visible,
-.mg-mcard:focus-visible, .mg-mode:focus-visible, .mg-belt-card:focus-visible, .mg-adv__btn:focus-visible, .mg-preview-chip:focus-visible {
+.mg-mcard:focus-visible, .mg-mode:focus-visible, .mg-adv__btn:focus-visible, .mg-preview-chip:focus-visible {
   outline: 3px solid var(--sea-500); outline-offset: 2px;
 }
 .mg-btn--primary { background: var(--sea-600); color: var(--on-accent); box-shadow: var(--shadow); }
@@ -622,16 +623,9 @@
   transition: transform 0.15s, border-color 0.15s;
 }
 .mg-mode:hover { transform: translateY(-2px); border-color: var(--sea-500); }
-.mg-mode__art { display: grid; place-items: center; height: 140px; border-radius: 12px; overflow: hidden; background: var(--card-panel); }
-.mg-mode__belt {
-  position: relative; width: 100%; height: 100%; overflow: hidden;
-  background: linear-gradient(transparent 70%, hsl(165 30% 22%) 70%, hsl(165 30% 22%) 88%, transparent 88%);
-}
-.mg-mode__belt i {
-  position: absolute; bottom: 30%; left: -60px; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 10px;
-  font-style: normal; font-size: 26px; background: var(--art-bg); border: 2px solid var(--sea-300); animation: mg-mode-belt 3.6s linear infinite;
-}
-@keyframes mg-mode-belt { to { left: 100%; } }
+/* Same shape as the cover scenes (320 × 150) so they show whole; capped so wide screens stay compact. */
+.mg-mode__art { display: grid; place-items: center; aspect-ratio: 32 / 15; max-height: 230px; border-radius: 12px; overflow: hidden; background: var(--card-panel); }
+.mg-mode__art .mg-scene { width: 100%; height: 100%; }
 .mg-mode__cards { display: flex; gap: 10px; }
 .mg-mode__cards i {
   display: grid; place-items: center; width: 54px; height: 74px; border-radius: 10px; font-style: normal; font-size: 26px; font-weight: 800;
@@ -666,37 +660,137 @@
 .mg-pcard:focus-visible { outline: 3px solid var(--sea-500); outline-offset: 2px; }
 @keyframes mg-match { 40% { transform: scale(1.1); } }
 
-/* ---------- Group Sort: conveyor ---------- */
-.mg-belt { position: relative; height: 150px; margin: 6px 0 16px; overflow: hidden; border-radius: 18px; background: var(--card-bg); border: 1px solid var(--card-edge); }
-.mg-belt__track {
-  position: absolute; left: 0; right: 0; bottom: 14px; height: 34px; background: hsl(165 45% 15%);
-  background-image: repeating-linear-gradient(90deg, hsl(165 35% 26%) 0 18px, hsl(165 45% 15%) 18px 36px); animation: mg-track 0.7s linear infinite;
-  box-shadow: inset 0 4px 0 rgba(255, 255, 255, 0.15);
+/* ---------- Group Sort: conveyor (factory + robot arm) ---------- */
+.mg-factory {
+  /* size: scene height, crate box, crate bottom (= belt top), how far the arm cable reaches */
+  --fh: 190px; --cw: 96px; --ch: 62px; --cb: 46px; --reach: 44px; --mw: 64px; --crate-font: 9.5px;
 }
-.mg-belt--stopped .mg-belt__track, .mg-belt--stopped .mg-belt-card { animation-play-state: paused; }
-@keyframes mg-track { to { background-position: 36px 0; } }
-.mg-belt-card {
-  position: absolute; left: -140px; bottom: 38px; width: 128px; height: 92px; padding: 6px; z-index: 1;
-  display: grid; place-items: center; border-radius: 12px; border: 2px solid var(--sea-300); background: var(--surface);
-  font-size: 12.5px; font-weight: 600; line-height: 1.25; text-align: center; cursor: grab; touch-action: none; user-select: none;
-  box-shadow: 0 4px 0 var(--sea-200); animation: mg-belt var(--dur) linear forwards;
+.mg-conveyor {
+  /* factory colors, shared by the scene and the button panel */
+  --f-ceil: #b9e4ec; --f-sky: #8fd0dc; --f-floor: #6aa8b3; --f-ghost: #ffffff;
+  --f-steel: #3d5560; --f-steel-dark: #2b3d45; --f-arm: #2b3d45; --f-arm-top: #2b3d45; --f-roller: #e7f3f5;
+  --f-crate: #d9a066; --f-crate-edge: #a8723d; --f-tape: #ecc792; --f-label: #fff8ec; --f-ink: #4a2f12;
+  --f-btn: #e9f4f6; --f-btn-ink: #1d2a30; --f-btn-edge: #8fb3bb;
 }
-.mg-belt-card--art { padding: 0; overflow: hidden; background: var(--art-bg); }
-.mg-belt-card--art svg { width: 100%; height: 100%; }
-.mg-belt-card--lead { border-color: #f59e0b; box-shadow: 0 0 0 3px #fde68a, 0 0 16px rgba(245, 158, 11, 0.6); z-index: 2; }
-.mg-belt-card--drag { opacity: 0.3; }
-.mg-drag-ghost.belt-card--ghost { animation: none; }
-@keyframes mg-belt { from { left: -140px; } to { left: 100%; } }
-.mg-bins { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.mg-factory {
+  position: relative; height: var(--fh); margin: 6px 0 12px; overflow: hidden; border-radius: 18px; border: 2px solid var(--f-steel-dark);
+  background: linear-gradient(var(--f-ceil) 0 12px, var(--f-sky) 12px 76%, var(--f-floor) 76%);
+}
+@media (max-width: 520px) {
+  .mg-factory { --fh: 160px; --cw: 76px; --ch: 52px; --cb: 38px; --reach: 32px; --mw: 50px; --crate-font: 7.5px; }
+  .mg-factory .mg-crate__box { padding: 9px 3px 3px; }
+  .mg-factory .mg-crate__tape { width: 14px; height: 9px; }
+  .mg-factory .mg-crate__label { padding: 1px 3px; line-height: 1.08; }
+}
+.mg-factory__ghost { position: absolute; top: 20px; width: 52px; height: auto; transform: translateX(-50%); color: var(--f-ghost); opacity: 0.22; }
+@media (max-width: 520px) { .mg-factory__ghost { width: 40px; } }
+/* Solid (not see-through) silhouettes, so where two workers pass only the front one shows.
+   Front lane: taller than the crate machine; back lane: a bit smaller, higher and paler. */
+.mg-worker {
+  --wh: 104px; position: absolute; bottom: 6px; left: calc(var(--wh) * -1.2);
+  color: color-mix(in srgb, var(--f-ghost) 30%, var(--f-sky)); animation: mg-walk-r 20s linear infinite;
+}
+.mg-worker--back { --wh: 90px; bottom: 20px; color: color-mix(in srgb, var(--f-ghost) 20%, var(--f-sky)); }
+.mg-worker svg { display: block; width: calc(var(--wh) * 54 / 47); height: var(--wh); max-width: none; }
+/* A thin outline in the wall colour separates a worker from whoever walks behind them. */
+.mg-worker svg g { stroke: var(--f-sky); stroke-width: 0.8px; paint-order: stroke; }
+.mg-worker--l { animation-name: mg-walk-l; }
+.mg-worker--l svg { transform: scaleX(-1); }
+@keyframes mg-walk-r { from { left: calc(var(--wh) * -1.2); } to { left: 100%; } }
+@keyframes mg-walk-l { from { left: 100%; } to { left: calc(var(--wh) * -1.2); } }
+.mg-worker__limb { transform-box: fill-box; transform-origin: 50% 0; animation: mg-step var(--step, 0.45s) ease-in-out infinite alternate; }
+.mg-worker__limb--alt { animation-direction: alternate-reverse; }
+@keyframes mg-step { from { transform: rotate(-20deg); } to { transform: rotate(20deg); } }
+@media (max-width: 520px) {
+  .mg-worker { --wh: 86px; bottom: 4px; }
+  .mg-worker--back { --wh: 74px; bottom: 16px; }
+}
+.mg-factory__rail { position: absolute; left: 0; right: 0; top: 12px; height: 8px; background: var(--f-steel); z-index: 3; }
+.mg-factory__machine {
+  position: absolute; left: 0; bottom: calc(var(--cb) - 16px); width: var(--mw); height: calc(var(--ch) + 30px); z-index: 3; border-radius: 0 8px 0 0;
+  background: var(--f-steel); box-shadow: inset -5px 0 0 var(--f-steel-dark);
+}
+.mg-factory__screen {
+  position: absolute; left: 8px; top: 10px; width: calc(var(--mw) - 22px); height: 22px; border-radius: 3px; background: #f4fbfc;
+  background-image: repeating-linear-gradient(90deg, #8fb3bb 0 3px, transparent 3px 6px); background-size: 100% 60%; background-position: bottom; background-repeat: no-repeat;
+}
+.mg-factory__dial { position: absolute; left: calc(50% - 16px); top: 42px; width: 26px; height: 26px; border-radius: 50%; background: #f4fbfc; border: 3px solid var(--f-steel-dark); }
+.mg-factory__dial::after { content: ''; position: absolute; left: 50%; top: 3px; width: 2px; height: 8px; background: var(--f-steel-dark); transform-origin: bottom; transform: rotate(-30deg); animation: mg-dial 2.4s ease-in-out infinite alternate; }
+@keyframes mg-dial { to { transform: rotate(40deg); } }
+.mg-factory__belt {
+  position: absolute; left: calc(var(--mw) - 16px); right: calc(var(--cw) * 0.7); bottom: calc(var(--cb) - 16px); height: 16px; z-index: 2; border-radius: 8px; background-color: var(--f-steel-dark);
+  background-image: radial-gradient(circle, var(--f-roller) 0 2.5px, transparent 3px); background-size: 20px 16px; animation: mg-rollers 0.7s linear infinite;
+}
+@keyframes mg-rollers { to { background-position: 20px 0; } }
+.mg-factory__legs {
+  position: absolute; left: calc(var(--mw) + 14px); right: calc(var(--cw) * 0.7 + 18px); bottom: 0; height: calc(var(--cb) - 16px); z-index: 1;
+  border-left: 5px solid var(--f-steel-dark); border-right: 5px solid var(--f-steel-dark); background: linear-gradient(transparent 10px, var(--f-steel-dark) 10px 15px, transparent 15px);
+}
+.mg-factory--stopped .mg-worker, .mg-factory--stopped .mg-worker__limb, .mg-factory--stopped .mg-factory__belt, .mg-factory--stopped .mg-crate:not(.mg-crate--falling), .mg-factory--stopped .mg-factory__dial::after { animation-play-state: paused; }
+
+.mg-crate { position: absolute; left: calc(-1 * var(--cw) - 18px); bottom: var(--cb); width: var(--cw); height: var(--ch); z-index: 2; animation: mg-belt var(--dur) linear forwards; }
+.mg-crate--grabbed { animation-play-state: paused; }
+@keyframes mg-belt { from { left: calc(-1 * var(--cw) - 18px); } to { left: calc(100% - var(--cw) * 1.2); } }
+/* Missed crate: pivots on the belt's end (its bottom centre sits on the edge), tipping faster and faster, then drops (gravity). */
+.mg-crate--falling { left: calc(100% - var(--cw) * 1.2); z-index: 1; transform-origin: 50% 100%; animation: mg-crate-fall 1s forwards; }
+@keyframes mg-crate-fall {
+  0% { transform: none; animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.55); }
+  45% { transform: translateX(calc(var(--cw) * 0.08)) rotate(34deg); animation-timing-function: cubic-bezier(0.45, 0, 1, 0.6); }
+  100% { transform: translate(calc(var(--cw) * 0.45), calc(var(--cb) + var(--ch) + 24px)) rotate(115deg); }
+}
+
+
+.mg-crate__box {
+  position: relative; display: grid; place-items: center; width: 100%; height: 100%; padding: 11px 5px 4px; border-radius: 4px;
+  background: var(--f-crate); border: 2px solid var(--f-crate-edge); box-shadow: inset 0 -5px 0 rgba(0, 0, 0, 0.08);
+}
+.mg-crate__tape { position: absolute; left: 50%; top: 0; width: 16px; height: 12px; transform: translateX(-50%); background: var(--f-tape); border-inline: 1px solid #c4925a; }
+.mg-crate__label {
+  display: grid; place-items: center; width: 100%; height: 100%; padding: 1px 4px; border-radius: 3px; background: var(--f-label);
+  color: var(--f-ink); font-size: var(--crate-font); font-weight: 700; line-height: 1.06; text-align: center; overflow: hidden;
+}
+.mg-crate--lead .mg-crate__box { border-color: #f59e0b; box-shadow: 0 0 0 3px #fde68a, 0 0 14px rgba(245, 158, 11, 0.7); }
+.mg-crate__stamp {
+  position: absolute; right: -7px; top: -7px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%;
+  color: #fff; font-weight: 800; font-size: 13px; border: 2px solid #fff;
+}
+.mg-crate__stamp--good { background: var(--ok); }
+.mg-crate__stamp--bad { background: var(--bad); }
+
+.mg-arm { position: absolute; top: 12px; z-index: 4; display: flex; flex-direction: column; align-items: center; transform: translateX(-50%); transition: left 0.22s ease-out; }
+.mg-arm__carriage { width: 28px; height: 12px; border-radius: 4px; background: var(--f-arm-top); }
+.mg-arm__cable { width: 6px; height: 4px; background: repeating-linear-gradient(var(--f-steel-dark) 0 3px, #8fb3bb 3px 6px); }
+.mg-arm--grab .mg-arm__cable { animation: mg-arm-reach 0.72s ease-in-out; }
+@keyframes mg-arm-reach { 0%, 28% { height: 4px; } 50%, 58% { height: var(--reach); } 100% { height: 4px; } }
+.mg-arm__head { position: relative; width: calc(var(--cw) + 10px); height: 15px; }
+.mg-arm__head::before { content: ''; position: absolute; left: 30%; right: 30%; top: 0; height: 10px; border-radius: 8px 8px 0 0; background: var(--f-arm); }
+.mg-arm__head::after { content: ''; position: absolute; left: 0; right: 0; top: 9px; height: 6px; border-radius: 3px; background: var(--f-arm); filter: brightness(1.15); }
+.mg-arm__claw { position: absolute; top: 12px; width: 5px; height: calc(var(--ch) * 0.42); border-radius: 3px; background: var(--f-arm); z-index: 2; transform-origin: top; transition: transform 0.15s; }
+.mg-arm__claw::after { content: ''; position: absolute; bottom: 0; width: 9px; height: 5px; border-radius: 3px; background: var(--f-arm); }
+.mg-arm__claw--l { left: 1px; transform: rotate(16deg); }
+.mg-arm__claw--l::after { left: 0; }
+.mg-arm__claw--r { right: 1px; transform: rotate(-16deg); }
+.mg-arm__claw--r::after { right: 0; }
+.mg-arm--grab .mg-arm__claw--l { animation: mg-claw-l 0.72s ease-in-out; }
+.mg-arm--grab .mg-arm__claw--r { animation: mg-claw-r 0.72s ease-in-out; }
+@keyframes mg-claw-l { 0%, 44% { transform: rotate(16deg); } 52%, 92% { transform: rotate(0deg); } }
+@keyframes mg-claw-r { 0%, 44% { transform: rotate(-16deg); } 52%, 92% { transform: rotate(0deg); } }
+.mg-arm__held { position: absolute; left: 50%; top: 14px; width: var(--cw); height: var(--ch); transform: translateX(-50%); animation: mg-held 0.36s ease-in forwards; }
+@keyframes mg-held { 0%, 55% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -20px) scale(0.85); } }
+
+.mg-panel { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px; border-radius: 18px; background: var(--f-steel); box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.25); }
 .mg-bin {
-  display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 96px; padding: 8px 6px; cursor: pointer;
-  border-radius: 18px; border: 3px dashed var(--sea-300); background: var(--surface); transition: transform 0.12s, background 0.15s, border-color 0.15s;
+  display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 88px; padding: 8px 6px 6px; cursor: pointer;
+  border-radius: 16px; border: 3px solid var(--f-btn-ink); background: var(--f-btn); box-shadow: 0 5px 0 var(--f-btn-ink);
+  transition: transform 0.08s, box-shadow 0.08s, background 0.15s, border-color 0.15s;
 }
-.mg-bin__art { width: 100%; max-width: 110px; border-radius: 8px; overflow: hidden; background: var(--art-bg); }
-.mg-bin__label { font-weight: 800; font-size: 16px; }
-.mg-bin:hover:not(:disabled), .mg-bin--hot { border-color: var(--sea-600); background: var(--sea-100); transform: translateY(-3px) scale(1.03); }
-.mg-bin--good { border-style: solid; border-color: var(--ok); background: var(--ok-bg); animation: mg-bump 0.35s; }
-.mg-bin--bad { border-style: solid; border-color: var(--bad); background: var(--bad-bg); animation: mg-shake 0.4s; }
+.mg-bin__art { width: 100%; max-width: 100px; border-radius: 8px; overflow: hidden; background: var(--art-bg); border: 2px solid var(--f-btn-edge); }
+.mg-bin__label { font-weight: 800; font-size: 15px; color: var(--f-btn-ink); }
+.mg-bin:hover:not(:disabled) { filter: brightness(1.04); }
+.mg-bin:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 var(--f-btn-ink); }
+.mg-bin--good { border-color: var(--ok); background: #e7f8ee; animation: mg-press-ok 0.35s; }
+@keyframes mg-press-ok { 40% { transform: scale(1.05); } }
+.mg-bin--bad { border-color: var(--bad); background: #fdecec; animation: mg-shake 0.4s; }
 
 /* ---------- Diameter: adventure map ---------- */
 .mg-adv__map {
@@ -851,7 +945,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .mg-sc-bob, .mg-bc-glow, .mg-bc-spark, .mg-sc-drift, .mg-sc-spin, .mg-sc-hop, .mg-sc-deal, .mg-sc-belt, .mg-sc-convey, .mg-sc-twinkle, .mg-sc-breathe, .mg-ribbon, .mg-btn--pulse,
-  .mg-hub-hero__mascot, .mg-armin__body, .mg-armin__head, .mg-armin__arm, .mg-armin__leg, .mg-rider__star, .mg-adv__mascot, .mg-lens__ring, .mg-mode__cards i, .mg-belt__track { animation: none; }
+  .mg-hub-hero__mascot, .mg-armin__body, .mg-armin__head, .mg-armin__arm, .mg-armin__leg, .mg-rider__star, .mg-adv__mascot, .mg-lens__ring, .mg-mode__cards i, .mg-factory__belt, .mg-factory__dial::after, .mg-worker__limb { animation: none; }
   .mg-pcard, .mg-pmatch { transition: none; animation: none; }
 }
 .mg-crash { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }

@@ -7,7 +7,8 @@ import { MuscleGames } from './muscle-games';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <MemoryRouter initialEntries={['/games']}>
+    {/* VITE_START opens a preview on one game, e.g. VITE_START=/games/group-sort */}
+    <MemoryRouter initialEntries={[import.meta.env.VITE_START || '/games']}>
       <Routes>
         <Route path="/games/*" element={<MuscleGames />} />
         <Route path="*" element={<Navigate to="/games" replace />} />
