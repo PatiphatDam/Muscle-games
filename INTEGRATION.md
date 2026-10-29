@@ -95,7 +95,7 @@ If `onGameFinish` throws (or returns a rejected Promise) the game keeps working;
 
 - Every class starts with `mg-` and every CSS rule is scoped under `.mg-root`.
 - No rules touch the main site's `body`, `html`, `h1` or `button`.
-- Fonts (**Nunito Sans**, **Playfair Display**, **Noto Sans Thai**) load from Google Fonts via `@import` in `styles.css`.
+- The module loads **no fonts itself** — the host provides them: **Nunito Sans** (text), **Playfair Display** (headings), **Noto Sans Thai**, and for the cover titles **Cinzel Decorative** (Balloon Pop) and **Bungee** (Conveyor Sort). The standalone pages import `src/fonts.css` (Google Fonts). The main site's Content Security Policy blocks Google Fonts — an `@import` there breaks the lazy-loaded games CSS ("Unable to preload CSS") — so it self-hosts them with `@fontsource` packages imported in `MuscleGamesPage.tsx`. Missing families fall back to system fonts.
 - The demo app (`src/demo-host.css`) adds deliberately clashing styles (a red upper-case `h1`, an orange `.btn`) and they don't leak into the games.
 - Dark mode follows the device setting, or the host's `<html data-theme="light|dark">`.
 

@@ -1,6 +1,5 @@
-/* Fonts of the Digital Muscle site (Coastal Soft): Nunito Sans text, Playfair Display headings, Noto Sans Thai for Thai.
-   Cinzel Decorative and Bungee are only for the Balloon Pop and Conveyor Sort cover titles. */
-@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400..800&family=Playfair+Display:wght@600..800&family=Noto+Sans+Thai:wght@400..700&family=Cinzel+Decorative:wght@700;900&family=Bungee&display=swap');
+/* Fonts (Nunito Sans, Playfair Display, Noto Sans Thai, Cinzel Decorative, Bungee) are loaded by the host page,
+   not here: the main site's CSP blocks Google Fonts. Standalone hosts import src/fonts.css. */
 
 /*
  * Theme = the Digital Muscle site's "Coastal Soft" Games colours (sea green, hue 165).
