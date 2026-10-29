@@ -55,6 +55,7 @@ Resulting URLs:
 |---|---|---|
 | `onGameFinish` | `(run) => void \| Promise` | Called every time a run ends; use it to save the score to the database (GAME-7) |
 | `className` | `string` | Extra class on the `.mg-root` wrapper |
+| `playerId` | `string \| null` | The signed-in student. A run whose save fails (offline) is kept in `localStorage` and re-sent automatically — on load, when the device comes back online and every 20 s — but only while this same player is signed in |
 | `hubTitle` | `boolean` (default `true`) | `false` hides the hub's own "Muscular Tissues I / Games" heading, for a host that renders its own page header (breadcrumb + back button) above the hub |
 | CSS `--mg-bottom-inset` | length (default `0px`) | Set on `.mg-root` (e.g. through `className`) to the height of a fixed bottom tab bar, so the sticky piece tray on phones stays above it |
 
@@ -89,7 +90,7 @@ async function saveRun(run) {
 }
 ```
 
-If `onGameFinish` throws (or returns a rejected Promise) the game keeps working; the error is logged to the console.
+If `onGameFinish` throws (or returns a rejected Promise) the game keeps working: the run waits in the outbox (`outbox.js`, up to 50 runs for 7 days) and is sent again later, and the result screen tells the student it will upload by itself. Save by `runId` so a re-sent run is never counted twice.
 
 ## 4. Keeping CSS separate from the main site
 
