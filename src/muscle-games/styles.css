@@ -648,11 +648,11 @@
   box-shadow: 0 2px 3px rgb(0 0 0 / 0.3), 0 8px 14px rgb(0 0 0 / 0.18);
 }
 .mg-mode__pic { background: #eef4f2 padding-box; border: 5px solid #fdfcf8; border-bottom-width: 16px; font-size: clamp(20px, 4vw, 32px); }
-.mg-mode__note { font-family: 'Permanent Marker', var(--font); font-size: clamp(10px, 1.8vw, 14px); background: linear-gradient(135deg, #fde68a 82%, #e7c55a 82% 88%, transparent 88%); }
+.mg-mode__note { font-family: 'Permanent Marker', var(--font); font-size: clamp(10px, 1.8vw, 14px); background: linear-gradient(135deg, #fde68a 84%, #e7c55a 84%); }
 .mg-mode__pic:nth-of-type(1) { left: 8%; rotate: -4deg; }
 .mg-mode__pic:nth-of-type(2) { left: 33%; rotate: 3deg; }
-.mg-mode__note:nth-of-type(3) { left: 58%; rotate: 2deg; background: linear-gradient(135deg, #fbcfe8 82%, #e5a6c8 82% 88%, transparent 88%); }
-.mg-mode__note:nth-of-type(4) { left: 80%; width: 17%; rotate: -3deg; background: linear-gradient(135deg, #bfdbfe 82%, #93b8e6 82% 88%, transparent 88%); }
+.mg-mode__note:nth-of-type(3) { left: 58%; rotate: 2deg; background: linear-gradient(135deg, #fbcfe8 84%, #e5a6c8 84%); }
+.mg-mode__note:nth-of-type(4) { left: 80%; width: 17%; rotate: -3deg; background: linear-gradient(135deg, #bfdbfe 84%, #93b8e6 84%); }
 .mg-mode__pic::before, .mg-mode__note::before {
   content: ''; position: absolute; top: -6px; left: 50%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%;
   background: radial-gradient(circle at 35% 30%, rgb(255 255 255 / 0.75) 0 2px, #d63a3a 3px); box-shadow: 1px 2px 3px rgb(0 0 0 / 0.4);
@@ -718,8 +718,8 @@
   width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: center;
   font-family: var(--marker); font-size: clamp(10px, 1.4vw, 13px); line-height: 1.5; color: #4a3b2c;
 }
-/* sticky note with a curled corner */
-.mg-pcard--text { padding: 14px 7px 9px; background: linear-gradient(135deg, var(--note) 82%, var(--note-dark) 82% 88%, transparent 88%); }
+/* sticky note with a folded corner */
+.mg-pcard--text { padding: 14px 7px 9px; background: linear-gradient(135deg, var(--note) 84%, var(--note-dark) 84%); }
 .mg-pmatch__grid .mg-pcard--text:nth-child(4n + 1) { --note: #fde68a; --note-dark: #e7c55a; }
 .mg-pmatch__grid .mg-pcard--text:nth-child(4n + 2) { --note: #fbcfe8; --note-dark: #e5a6c8; }
 .mg-pmatch__grid .mg-pcard--text:nth-child(4n + 3) { --note: #bfdbfe; --note-dark: #93b8e6; }
@@ -730,8 +730,9 @@
   transform: translateY(-7px) scale(1.06); z-index: 3;
   box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--sea-500), 0 16px 24px rgb(0 0 0 / 0.35);
 }
-.mg-pcard--matched, .mg-pcard--matched:hover { cursor: default; transform: none; animation: mg-match 0.5s ease-out; }
-.mg-pcard--matched .mg-pcard__pin { width: 16px; height: 16px; margin-left: -8px; }
+.mg-pcard--matched, .mg-pcard--matched:hover { cursor: default; transform: none; }
+/* a found pair's pins are redrawn on top of its string (see .mg-cork__strings), so hide the card's own */
+.mg-pcard--matched .mg-pcard__pin { visibility: hidden; }
 .mg-pcard--wrong { box-shadow: 0 0 0 3px var(--bad), 0 8px 14px rgb(0 0 0 / 0.25); animation: mg-shake 0.4s; }
 .mg-pcard:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 /* strings sit over the cards, between the pins */
@@ -740,7 +741,7 @@
   fill: none; stroke-width: 2.5; stroke-linecap: round; filter: drop-shadow(1px 2px 1px rgb(0 0 0 / 0.35));
   stroke-dasharray: 1; animation: mg-string 0.5s ease-out;
 }
-@keyframes mg-match { 40% { transform: scale(1.1); } }
+.mg-cork__strings circle { fill: url(#mg-pin-red); filter: drop-shadow(1px 3px 2px rgb(0 0 0 / 0.4)); }
 @keyframes mg-pin-up { from { opacity: 0; transform: translateY(-30px) scale(1.15); } }
 @keyframes mg-string { from { stroke-dashoffset: 1; } }
 

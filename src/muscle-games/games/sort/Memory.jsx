@@ -9,7 +9,7 @@ import { PAIRS } from './data.js';
 // that belongs to it; a found pair gets tied together with a string.
 const TIME = 150;
 const ROUND_BREAK_MS = 1400;
-// String and pin colours for matched pairs, in the order they are found (both cards of a pair share one).
+// String colours for matched pairs, in the order they are found (both cards of a pair share one).
 const TAGS = ['#e64980', '#f08c00', '#2f9e44', '#1c7ed6', '#7048e8', '#0c8599'];
 export const ROUNDS = [
   { id: 'name', title: 'Name it', hint: 'match each picture with its name', count: 6 },
@@ -56,7 +56,8 @@ export default function Memory({ onScore, onFinish }) {
     return () => list.forEach(clearTimeout);
   }, [fx]);
 
-  // Tie each found pair's pins together; re-measured whenever the board changes size.
+  // Tie each found pair's pins together; re-measured when the board changes size and after a card
+  // settles (the card tapped first is still sliding back from its lifted "selected" look).
   useLayoutEffect(() => {
     const board = boardRef.current;
     if (!board) return undefined;
@@ -77,7 +78,11 @@ export default function Memory({ onScore, onFinish }) {
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(board);
-    return () => ro.disconnect();
+    board.addEventListener('transitionend', measure);
+    return () => {
+      ro.disconnect();
+      board.removeEventListener('transitionend', measure);
+    };
   }, [matched, deck]);
 
   function end(completed) {
@@ -144,8 +149,8 @@ export default function Memory({ onScore, onFinish }) {
     }
   };
 
-  // Matched cards take their pair's pin colour; `i` staggers the pin-up animation.
-  const cardStyle = (c, i) => ({ '--i': i, ...(matched[c.pair] && { '--pin': TAGS[(matched[c.pair] - 1) % TAGS.length] }) });
+  // `i` staggers the pin-up animation.
+  const cardStyle = (c, i) => ({ '--i': i });
 
   const cardClass = (c) =>
     `mg-pcard mg-pcard--${c.kind}${selected?.uid === c.uid ? ' mg-pcard--selected' : ''}${matched[c.pair] ? ' mg-pcard--matched' : ''}${
@@ -208,7 +213,15 @@ export default function Memory({ onScore, onFinish }) {
             </div>
           </div>
         </div>
+        {/* strings run from pin centre to pin centre; the pins are drawn again on top so the string sits behind them */}
         <svg className="mg-cork__strings" aria-hidden="true">
+          <defs>
+            <radialGradient id="mg-pin-red" cx="35%" cy="30%" r="70%">
+              <stop offset="0.25" stopColor="#ffb4b4" />
+              <stop offset="0.45" stopColor="#d63a3a" />
+              <stop offset="1" stopColor="#a82424" />
+            </radialGradient>
+          </defs>
           {strings.map(({ pair, a, b, color }) => (
             <path
               key={`${round}-${pair}`}
@@ -217,6 +230,7 @@ export default function Memory({ onScore, onFinish }) {
               stroke={color}
             />
           ))}
+          {strings.flatMap(({ pair, a, b }) => [a, b].map((p, k) => <circle key={`${round}-${pair}-${k}`} cx={p.x} cy={p.y} r="7" />))}
         </svg>
       </div>
     </section>
