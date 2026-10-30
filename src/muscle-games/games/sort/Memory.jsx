@@ -8,6 +8,8 @@ import { PAIRS } from './data.js';
 // Picture Match: every card is face up. Tap a picture, then the name (or feature) that belongs to it.
 const TIME = 150;
 const ROUND_BREAK_MS = 1400;
+// Sticker colours for matched pairs, in the order they are found (both cards of a pair share one).
+const TAGS = ['#e64980', '#f08c00', '#2f9e44', '#1c7ed6', '#7048e8', '#0c8599'];
 export const ROUNDS = [
   { id: 'name', title: 'Name it', hint: 'match each picture with its name', count: 6 },
   { id: 'clue', title: 'Key features', hint: 'match each picture with its key feature', count: 6 },
@@ -100,7 +102,7 @@ export default function Memory({ onScore, onFinish }) {
       fx.burst(x, y, 20);
       fx.float(x, y - 20, '✓');
       fx.say(`${pick(['A match!', 'Great!', 'Sharp eyes!'])} ${pic.p.name}`, 'happy');
-      const nextMatched = { ...matched, [pic.pair]: true };
+      const nextMatched = { ...matched, [pic.pair]: Object.keys(matched).length + 1 };
       setMatched(nextMatched);
       if (Object.keys(nextMatched).length === deck.pics.length) roundCleared();
     } else {
@@ -114,6 +116,10 @@ export default function Memory({ onScore, onFinish }) {
       later(() => setWrongPair([]), 700);
     }
   };
+
+  // Matched cards carry a numbered sticker; `i` staggers the deal-in animation.
+  const cardStyle = (c, i) => ({ '--i': i, ...(matched[c.pair] && { '--tag': TAGS[(matched[c.pair] - 1) % TAGS.length] }) });
+  const tag = (c) => matched[c.pair] && <span className="mg-pcard__tag" aria-hidden="true">{matched[c.pair]}</span>;
 
   const cardClass = (c) =>
     `mg-pcard mg-pcard--${c.kind}${selected?.uid === c.uid ? ' mg-pcard--selected' : ''}${matched[c.pair] ? ' mg-pcard--matched' : ''}${
@@ -135,17 +141,19 @@ export default function Memory({ onScore, onFinish }) {
         <div className="mg-pmatch__col">
           <p className="mg-pmatch__label">🖼️ Pictures</p>
           <div className="mg-pmatch__grid">
-            {deck.pics.map((c) => (
+            {deck.pics.map((c, i) => (
               <button
                 key={c.uid}
                 type="button"
                 data-card={c.uid}
                 className={cardClass(c)}
+                style={cardStyle(c, i)}
                 onClick={() => tap(c)}
                 aria-pressed={selected?.uid === c.uid}
                 aria-label={matched[c.pair] ? `Picture: ${c.p.name} (matched)` : 'Picture card'}
               >
                 <c.p.Art />
+                {tag(c)}
               </button>
             ))}
           </div>
@@ -153,16 +161,18 @@ export default function Memory({ onScore, onFinish }) {
         <div className="mg-pmatch__col">
           <p className="mg-pmatch__label">🏷️ {ROUNDS[round].id === 'name' ? 'Names' : ROUNDS[round].id === 'clue' ? 'Key features' : 'Names / key features'}</p>
           <div className="mg-pmatch__grid">
-            {deck.texts.map((c) => (
+            {deck.texts.map((c, i) => (
               <button
                 key={c.uid}
                 type="button"
                 data-card={c.uid}
                 className={cardClass(c)}
+                style={cardStyle(c, deck.pics.length + i)}
                 onClick={() => tap(c)}
                 aria-pressed={selected?.uid === c.uid}
               >
                 <strong>{c.text}</strong>
+                {tag(c)}
               </button>
             ))}
           </div>
