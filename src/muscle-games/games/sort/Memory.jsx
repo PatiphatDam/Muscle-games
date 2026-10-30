@@ -1,14 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { pick, useFx } from '../../fx/Fx.jsx';
 import { TimerBar, useCountdown } from '../../components/Hud.jsx';
 import { scoreOutOf10 } from '../meta.js';
 import { sample, shuffle } from '../util.js';
 import { PAIRS } from './data.js';
 
-// Picture Match: every card is face up. Tap a picture, then the name (or feature) that belongs to it.
+// Picture Match: every card is face up on an evidence board. Tap a photo, then the note (name or feature)
+// that belongs to it; a found pair gets tied together with a string.
 const TIME = 150;
 const ROUND_BREAK_MS = 1400;
-// Sticker colours for matched pairs, in the order they are found (both cards of a pair share one).
+// String and pin colours for matched pairs, in the order they are found (both cards of a pair share one).
 const TAGS = ['#e64980', '#f08c00', '#2f9e44', '#1c7ed6', '#7048e8', '#0c8599'];
 export const ROUNDS = [
   { id: 'name', title: 'Name it', hint: 'match each picture with its name', count: 6 },
@@ -38,6 +39,8 @@ export default function Memory({ onScore, onFinish }) {
   const [wrongPair, setWrongPair] = useState([]);
   const [between, setBetween] = useState(false);
   const [over, setOver] = useState(false);
+  const [strings, setStrings] = useState([]);
+  const boardRef = useRef(null);
   const st = useRef({ misses: 0, found: 0, mistakes: [] });
   const timers = useRef([]);
   const later = (fn, ms) => timers.current.push(setTimeout(fn, ms));
@@ -48,10 +51,34 @@ export default function Memory({ onScore, onFinish }) {
   const [left] = useCountdown(TIME, { running: !between && !over, onExpire: () => end(false) });
 
   useEffect(() => {
-    fx.say(`Round 1: ${ROUNDS[0].hint}. Tap a picture, then the words that go with it!`, 'happy');
+    fx.say(`Case 1: ${ROUNDS[0].hint}. Tap a photo, then the note that goes with it!`, 'happy');
     const list = timers.current;
     return () => list.forEach(clearTimeout);
   }, [fx]);
+
+  // Tie each found pair's pins together; re-measured whenever the board changes size.
+  useLayoutEffect(() => {
+    const board = boardRef.current;
+    if (!board) return undefined;
+    const measure = () => {
+      const box = board.getBoundingClientRect();
+      const pin = (uid) => {
+        const r = board.querySelector(`[data-card="${uid}"] .mg-pcard__pin`)?.getBoundingClientRect();
+        return r && { x: r.left + r.width / 2 - box.left, y: r.top + r.height / 2 - box.top };
+      };
+      setStrings(
+        Object.entries(matched).flatMap(([pair, n]) => {
+          const a = pin(`${pair}-pic`);
+          const b = pin(`${pair}-txt`);
+          return a && b ? [{ pair, a, b, color: TAGS[(n - 1) % TAGS.length] }] : [];
+        })
+      );
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(board);
+    return () => ro.disconnect();
+  }, [matched, deck]);
 
   function end(completed) {
     if (s.over) return;
@@ -76,7 +103,7 @@ export default function Memory({ onScore, onFinish }) {
     const next = ROUNDS[round + 1];
     setBetween(true);
     fx.sound('win');
-    fx.say(`Round ${round + 1} cleared! Next, round ${round + 2}: ${next.hint}`, 'wow');
+    fx.say(`Case ${round + 1} cleared! Next, case ${round + 2}: ${next.hint}`, 'wow');
     later(() => {
       setRound(round + 1);
       setMatched({});
@@ -117,9 +144,8 @@ export default function Memory({ onScore, onFinish }) {
     }
   };
 
-  // Matched cards carry a numbered sticker; `i` staggers the deal-in animation.
-  const cardStyle = (c, i) => ({ '--i': i, ...(matched[c.pair] && { '--tag': TAGS[(matched[c.pair] - 1) % TAGS.length] }) });
-  const tag = (c) => matched[c.pair] && <span className="mg-pcard__tag" aria-hidden="true">{matched[c.pair]}</span>;
+  // Matched cards take their pair's pin colour; `i` staggers the pin-up animation.
+  const cardStyle = (c, i) => ({ '--i': i, ...(matched[c.pair] && { '--pin': TAGS[(matched[c.pair] - 1) % TAGS.length] }) });
 
   const cardClass = (c) =>
     `mg-pcard mg-pcard--${c.kind}${selected?.uid === c.uid ? ' mg-pcard--selected' : ''}${matched[c.pair] ? ' mg-pcard--matched' : ''}${
@@ -132,51 +158,66 @@ export default function Memory({ onScore, onFinish }) {
         <TimerBar left={left} total={TIME} />
         <div className="mg-hud__row">
           <span className="mg-hud__q">
-            🖼️ Round {round + 1}/{ROUNDS.length} · {ROUNDS[round].title} · {Object.keys(matched).length}/{deck.pics.length}
+            🔎 Case {round + 1}/{ROUNDS.length} · {ROUNDS[round].title} · {Object.keys(matched).length}/{deck.pics.length}
           </span>
         </div>
       </div>
-      {between && <p className="mg-peek-banner">✨ Round {round + 2} coming up…</p>}
-      <div className={`mg-pmatch${between ? ' mg-pmatch--fade' : ''}`} key={round}>
-        <div className="mg-pmatch__col">
-          <p className="mg-pmatch__label">🖼️ Pictures</p>
-          <div className="mg-pmatch__grid">
-            {deck.pics.map((c, i) => (
-              <button
-                key={c.uid}
-                type="button"
-                data-card={c.uid}
-                className={cardClass(c)}
-                style={cardStyle(c, i)}
-                onClick={() => tap(c)}
-                aria-pressed={selected?.uid === c.uid}
-                aria-label={matched[c.pair] ? `Picture: ${c.p.name} (matched)` : 'Picture card'}
-              >
-                <c.p.Art />
-                {tag(c)}
-              </button>
-            ))}
+      {between && <p className="mg-peek-banner">📌 Case {round + 2} coming up…</p>}
+      <div className="mg-cork" ref={boardRef}>
+        <div className={`mg-pmatch${between ? ' mg-pmatch--fade' : ''}`} key={round}>
+          <div className="mg-pmatch__col">
+            <p className="mg-pmatch__label">Evidence</p>
+            <div className="mg-pmatch__grid">
+              {deck.pics.map((c, i) => (
+                <button
+                  key={c.uid}
+                  type="button"
+                  data-card={c.uid}
+                  className={cardClass(c)}
+                  style={cardStyle(c, i)}
+                  onClick={() => tap(c)}
+                  aria-pressed={selected?.uid === c.uid}
+                  aria-label={matched[c.pair] ? `Picture: ${c.p.name} (matched)` : 'Picture card'}
+                >
+                  <i className="mg-pcard__pin" />
+                  <span className="mg-pcard__photo">
+                    <c.p.Art />
+                  </span>
+                  <span className="mg-pcard__caption">{matched[c.pair] ? c.p.name : '?'}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="mg-pmatch__col">
+            <p className="mg-pmatch__label">{ROUNDS[round].id === 'name' ? 'Names' : ROUNDS[round].id === 'clue' ? 'Key features' : 'Names / key features'}</p>
+            <div className="mg-pmatch__grid">
+              {deck.texts.map((c, i) => (
+                <button
+                  key={c.uid}
+                  type="button"
+                  data-card={c.uid}
+                  className={cardClass(c)}
+                  style={cardStyle(c, deck.pics.length + i)}
+                  onClick={() => tap(c)}
+                  aria-pressed={selected?.uid === c.uid}
+                >
+                  <i className="mg-pcard__pin" />
+                  <strong>{c.text}</strong>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-        <div className="mg-pmatch__col">
-          <p className="mg-pmatch__label">🏷️ {ROUNDS[round].id === 'name' ? 'Names' : ROUNDS[round].id === 'clue' ? 'Key features' : 'Names / key features'}</p>
-          <div className="mg-pmatch__grid">
-            {deck.texts.map((c, i) => (
-              <button
-                key={c.uid}
-                type="button"
-                data-card={c.uid}
-                className={cardClass(c)}
-                style={cardStyle(c, deck.pics.length + i)}
-                onClick={() => tap(c)}
-                aria-pressed={selected?.uid === c.uid}
-              >
-                <strong>{c.text}</strong>
-                {tag(c)}
-              </button>
-            ))}
-          </div>
-        </div>
+        <svg className="mg-cork__strings" aria-hidden="true">
+          {strings.map(({ pair, a, b, color }) => (
+            <path
+              key={`${round}-${pair}`}
+              d={`M${a.x} ${a.y} Q${(a.x + b.x) / 2} ${(a.y + b.y) / 2 + Math.hypot(b.x - a.x, b.y - a.y) * 0.12} ${b.x} ${b.y}`}
+              pathLength="1"
+              stroke={color}
+            />
+          ))}
+        </svg>
       </div>
     </section>
   );

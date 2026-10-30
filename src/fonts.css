@@ -2,10 +2,12 @@
  * Same self-hosted @fontsource packages as the main site, so the games look identical in both
  * and nothing is loaded from Google (the main site's CSP blocks it).
  * Nunito Sans text, Playfair Display headings, Inter fallback (the main site's body font),
- * Cinzel Decorative and Bungee only for the Balloon Pop and Conveyor Sort cover titles. */
+ * Cinzel Decorative and Bungee only for the Balloon Pop and Conveyor Sort cover titles,
+ * Permanent Marker for the handwriting on the Picture Match evidence board. */
 @import '@fontsource-variable/inter';
 @import '@fontsource-variable/nunito-sans';
 @import '@fontsource-variable/playfair-display';
 @import '@fontsource/bungee/latin-400.css';
 @import '@fontsource/cinzel-decorative/latin-700.css';
 @import '@fontsource/cinzel-decorative/latin-900.css';
+@import '@fontsource/permanent-marker/latin-400.css';
