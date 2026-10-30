@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useScores } from '../scores.jsx';
 import { MAX_SCORE } from './meta.js';
-import { ConveyorCoverScene } from '../covers.jsx';
+import { ConveyorCoverScene, DetectiveCoverScene } from '../covers.jsx';
 import Memory from './sort/Memory.jsx';
 import Conveyor from './sort/Conveyor.jsx';
 
@@ -32,18 +32,7 @@ function ModeSelect({ onPick }) {
           <button key={m.id} type="button" className={`mg-mode mg-mode--${m.id}`} onClick={() => onPick(m.id)}>
             <span className="mg-mode__art" aria-hidden="true">
               {m.id === 'memory' ? (
-                <span className="mg-mode__cork">
-                  <b className="mg-mode__tape">Picture Match</b>
-                  <svg className="mg-mode__string" viewBox="0 0 320 150" preserveAspectRatio="none">
-                    <path d="M58 45 Q138 125 218 45" stroke="#e64980" />
-                    <path d="M138 45 Q210 115 283 45" stroke="#1c7ed6" />
-                  </svg>
-                  {[['pic', '🫀'], ['pic', '💪'], ['note', 'Cardiac'], ['note', 'Skeletal']].map(([kind, c], k) => (
-                    <i key={k} className={`mg-mode__${kind}`}>
-                      {c}
-                    </i>
-                  ))}
-                </span>
+                <DetectiveCoverScene />
               ) : (
                 <ConveyorCoverScene />
               )}
