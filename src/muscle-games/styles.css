@@ -637,29 +637,37 @@
 .mg-mode__meta { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 700; color: var(--card-muted); padding-top: 8px; border-top: 1px solid var(--card-hair); }
 
 /* ---------- Group Sort: picture match ---------- */
-.mg-peek-banner { text-align: center; font-weight: 700; color: var(--sea-700); margin-bottom: 8px; animation: mg-blink 0.8s steps(2) infinite; }
-/* Picture Match = an evidence board: cork in a wooden frame, photos as pinned polaroids, names as
-   sticky notes, and a string tying each found pair together. The board keeps its own colours in dark
-   mode (like the --art-* pictures). Permanent Marker comes from the host page's fonts. */
+/* Picture Match = a noir evidence wall, like its cover: a dark office wall lit through window blinds,
+   photos as pinned polaroids, names as old paper notes, and a red string tying each found pair together.
+   The board keeps its own colours in light and dark mode. Permanent Marker comes from the host page's fonts. */
 .mg-cork {
-  --cork: #b48a5c; --cork-dark: #8f6a42; --wood: #5a3b22; --pin: #d63a3a; --ink: #2b2118;
+  --wall: #2a241f; --wall-dark: #0f0d0c; --pin: #d63a3a; --ink: #241c15; --string: #c0262d; --light: #efe3cc;
   --marker: 'Permanent Marker', var(--font);
-  position: relative; max-width: 980px; margin: 0 auto; padding: 10px 10px 14px; border-radius: 14px;
-  border: 8px solid var(--wood);
+  position: relative; max-width: 980px; margin: 0 auto; padding: 10px 10px 14px; border-radius: 14px; overflow: hidden;
+  border: 1px solid #3a322b;
   background:
-    radial-gradient(circle at 20% 30%, rgb(0 0 0 / 0.08) 0 1px, transparent 2px) 0 0 / 13px 13px,
-    radial-gradient(circle at 70% 60%, rgb(255 255 255 / 0.1) 0 1px, transparent 2px) 0 0 / 17px 17px,
-    radial-gradient(ellipse at 50% 40%, var(--cork), var(--cork-dark));
-  box-shadow: inset 0 0 24px rgb(0 0 0 / 0.35), 0 0 0 2px #3d2715, var(--shadow-lg);
+    radial-gradient(circle at 20% 30%, rgb(255 255 255 / 0.03) 0 1px, transparent 2px) 0 0 / 11px 11px,
+    radial-gradient(ellipse at 75% 15%, var(--wall), var(--wall-dark) 75%);
+  box-shadow: inset 0 0 50px rgb(0 0 0 / 0.75), var(--shadow-lg);
 }
-.mg-pmatch { display: grid; gap: 8px; }
+/* light falling through the blinds, behind the cards */
+.mg-cork::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    repeating-linear-gradient(118deg, transparent 0 22px, rgb(15 13 12 / 0.55) 22px 34px),
+    linear-gradient(118deg, transparent 30%, rgb(239 227 204 / 0.16) 45%, rgb(239 227 204 / 0.05) 70%, transparent 85%);
+  -webkit-mask: linear-gradient(118deg, transparent 30%, #000 45%, #000 70%, transparent 85%);
+  mask: linear-gradient(118deg, transparent 30%, #000 45%, #000 70%, transparent 85%);
+  animation: mg-flicker 5s ease-in-out infinite;
+}
+.mg-pmatch { position: relative; display: grid; gap: 8px; }
 @media (min-width: 600px) { .mg-pmatch { grid-template-columns: 1fr 1fr; gap: 22px; } }
 .mg-pmatch--fade { opacity: 0.45; transition: opacity 0.3s; pointer-events: none; }
 /* a strip of masking tape with the column name on it */
 .mg-pmatch__label {
   justify-self: start; display: inline-block; margin: 0 0 8px; padding: 2px 12px; rotate: -1.5deg;
   font-family: var(--marker); font-size: 14px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink);
-  background: rgb(250 240 215 / 0.92); box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
+  background: rgb(222 208 180 / 0.9); box-shadow: 0 1px 3px rgb(0 0 0 / 0.5);
 }
 .mg-pmatch__col { display: grid; align-content: start; }
 /* 3 × 2 on every screen so all 12 cards fit without scrolling. */
@@ -668,7 +676,7 @@
   --r: 0deg;
   position: relative; display: grid; place-items: center; min-height: 72px; padding: 0; cursor: pointer; font: inherit; color: var(--ink);
   border: 0; border-radius: 2px; rotate: var(--r);
-  box-shadow: 0 2px 3px rgb(0 0 0 / 0.3), 0 8px 14px rgb(0 0 0 / 0.18);
+  box-shadow: 0 2px 3px rgb(0 0 0 / 0.5), 0 10px 18px rgb(0 0 0 / 0.45);
   transition: transform 0.15s, box-shadow 0.15s;
   animation: mg-pin-up 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2) backwards; animation-delay: calc(var(--i, 0) * 55ms);
 }
@@ -684,32 +692,32 @@
   background: radial-gradient(circle at 35% 30%, rgb(255 255 255 / 0.75) 0 2px, var(--pin) 3px); box-shadow: 1px 3px 3px rgb(0 0 0 / 0.4);
   transition: background 0.2s;
 }
-.mg-pcard:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 4px 6px rgb(0 0 0 / 0.3), 0 14px 22px rgb(0 0 0 / 0.22); }
-/* polaroid: white frame with a thicker bottom for the caption */
-.mg-pcard--pic { grid-template-rows: auto auto; gap: 2px; padding: 6px 6px 3px; background: #fdfcf8; }
+.mg-pcard:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 4px 6px rgb(0 0 0 / 0.5), 0 16px 26px rgb(0 0 0 / 0.5); }
+/* polaroid: aged frame with a thicker bottom for the caption; the photo is only lightly toned so the tissue stays clear */
+.mg-pcard--pic { grid-template-rows: auto auto; gap: 2px; padding: 6px 6px 3px; background: #e6dcc8; }
 .mg-pcard__photo { display: block; width: 100%; aspect-ratio: 4 / 3; overflow: hidden; background: var(--art-bg); box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.08); }
-.mg-pcard__photo svg { display: block; width: 100%; height: 100%; }
+.mg-pcard__photo svg { display: block; width: 100%; height: 100%; filter: sepia(0.35) saturate(0.85); }
 .mg-pcard__caption {
   width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: center;
   font-family: var(--marker); font-size: clamp(10px, 1.4vw, 13px); line-height: 1.5; color: #4a3b2c;
 }
-/* sticky note with a folded corner */
+/* old paper note with a folded corner */
 .mg-pcard--text { padding: 14px 7px 9px; background: linear-gradient(135deg, var(--note) 84%, var(--note-dark) 84%); }
-.mg-pmatch__grid .mg-pcard--text:nth-child(4n + 1) { --note: #fde68a; --note-dark: #e7c55a; }
-.mg-pmatch__grid .mg-pcard--text:nth-child(4n + 2) { --note: #fbcfe8; --note-dark: #e5a6c8; }
-.mg-pmatch__grid .mg-pcard--text:nth-child(4n + 3) { --note: #bfdbfe; --note-dark: #93b8e6; }
-.mg-pmatch__grid .mg-pcard--text:nth-child(4n + 4) { --note: #d9f99d; --note-dark: #b5d96c; }
+.mg-pmatch__grid .mg-pcard--text:nth-child(4n + 1) { --note: #ddd0b4; --note-dark: #b9aa8a; }
+.mg-pmatch__grid .mg-pcard--text:nth-child(4n + 2) { --note: #cfc1a3; --note-dark: #a8987a; }
+.mg-pmatch__grid .mg-pcard--text:nth-child(4n + 3) { --note: #e4d9c2; --note-dark: #bfb294; }
+.mg-pmatch__grid .mg-pcard--text:nth-child(4n + 4) { --note: #d6c7a7; --note-dark: #b0a080; }
 .mg-pcard--text strong { font-family: var(--marker); font-weight: 400; font-size: clamp(11px, 1.5vw, 15px); text-align: center; line-height: 1.3; }
 .mg-pcard--selected,
 .mg-pcard--selected:hover {
   transform: translateY(-7px) scale(1.06); z-index: 3;
-  box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--sea-500), 0 16px 24px rgb(0 0 0 / 0.35);
+  box-shadow: 0 0 0 3px var(--light), 0 0 0 6px var(--string), 0 0 26px rgb(239 227 204 / 0.35), 0 16px 24px rgb(0 0 0 / 0.6);
 }
 .mg-pcard--matched, .mg-pcard--matched:hover { cursor: default; transform: none; }
 /* a found pair's pins are redrawn on top of its string (see .mg-cork__strings), so hide the card's own */
 .mg-pcard--matched .mg-pcard__pin { visibility: hidden; }
 .mg-pcard--wrong { box-shadow: 0 0 0 3px var(--bad), 0 8px 14px rgb(0 0 0 / 0.25); animation: mg-shake 0.4s; }
-.mg-pcard:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.mg-pcard:focus-visible { outline: 3px solid var(--light); outline-offset: 3px; }
 /* strings sit over the cards, between the pins */
 .mg-cork__strings { position: absolute; inset: 0; z-index: 4; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
 .mg-cork__strings path {
@@ -717,6 +725,14 @@
   stroke-dasharray: 1; animation: mg-string 0.5s ease-out;
 }
 .mg-cork__strings circle { fill: url(#mg-pin-red); filter: drop-shadow(1px 3px 2px rgb(0 0 0 / 0.4)); }
+/* rubber stamp over the board when a case is cleared */
+.mg-cork__stamp {
+  position: absolute; top: 50%; left: 50%; z-index: 5; margin: 0; padding: 6px 18px; pointer-events: none; white-space: nowrap;
+  font-family: var(--font-serif); font-weight: 800; font-size: clamp(26px, 7vw, 46px); letter-spacing: 0.08em; color: var(--string);
+  border: 4px double var(--string); border-radius: 6px; background: rgb(15 13 12 / 0.88); box-shadow: 0 8px 24px rgb(0 0 0 / 0.6);
+  transform: translate(-50%, -50%) rotate(-10deg); animation: mg-stamp 0.35s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+@keyframes mg-stamp { from { opacity: 0; transform: translate(-50%, -50%) rotate(-10deg) scale(2.2); } }
 @keyframes mg-pin-up { from { opacity: 0; transform: translateY(-30px) scale(1.15); } }
 @keyframes mg-string { from { stroke-dashoffset: 1; } }
 
@@ -1031,6 +1047,6 @@
 @media (prefers-reduced-motion: reduce) {
   .mg-sc-bob, .mg-bc-glow, .mg-bc-spark, .mg-sc-drift, .mg-sc-spin, .mg-sc-hop, .mg-sc-deal, .mg-sc-belt, .mg-sc-convey, .mg-sc-twinkle, .mg-sc-breathe, .mg-sc-flicker, .mg-btn--pulse,
   .mg-hub-hero__mascot, .mg-armin__body, .mg-armin__head, .mg-armin__arm, .mg-armin__leg, .mg-adv__mascot, .mg-lens__ring, .mg-factory__belt, .mg-factory__dial::after, .mg-worker__limb { animation: none; }
-  .mg-pcard, .mg-pmatch, .mg-cork__strings path { transition: none; animation: none; }
+  .mg-pcard, .mg-pmatch, .mg-cork::before, .mg-cork__strings path, .mg-cork__stamp { transition: none; animation: none; }
 }
 .mg-crash { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }

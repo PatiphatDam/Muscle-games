@@ -9,8 +9,6 @@ import { PAIRS } from './data.js';
 // that belongs to it; a found pair gets tied together with a string.
 const TIME = 150;
 const ROUND_BREAK_MS = 1400;
-// String colours for matched pairs, in the order they are found (both cards of a pair share one).
-const TAGS = ['#e64980', '#f08c00', '#2f9e44', '#1c7ed6', '#7048e8', '#0c8599'];
 export const ROUNDS = [
   { id: 'name', title: 'Name it', hint: 'match each picture with its name', count: 6 },
   { id: 'clue', title: 'Key features', hint: 'match each picture with its key feature', count: 6 },
@@ -38,6 +36,7 @@ export default function Memory({ onScore, onFinish }) {
   const [matched, setMatched] = useState({});
   const [wrongPair, setWrongPair] = useState([]);
   const [between, setBetween] = useState(false);
+  const [closed, setClosed] = useState(false); // shows the CASE CLOSED stamp
   const [over, setOver] = useState(false);
   const [strings, setStrings] = useState([]);
   const boardRef = useRef(null);
@@ -68,10 +67,10 @@ export default function Memory({ onScore, onFinish }) {
         return r && { x: r.left + r.width / 2 - box.left, y: r.top + r.height / 2 - box.top };
       };
       setStrings(
-        Object.entries(matched).flatMap(([pair, n]) => {
+        Object.keys(matched).flatMap((pair) => {
           const a = pin(`${pair}-pic`);
           const b = pin(`${pair}-txt`);
-          return a && b ? [{ pair, a, b, color: TAGS[(n - 1) % TAGS.length] }] : [];
+          return a && b ? [{ pair, a, b }] : [];
         })
       );
     };
@@ -89,6 +88,7 @@ export default function Memory({ onScore, onFinish }) {
     if (s.over) return;
     s.over = true;
     setOver(true);
+    setClosed(completed);
     fx.say(completed ? 'All pairs found! 🎉' : 'Time’s up! ⏰', completed ? 'wow' : 'sad');
     later(
       () =>
@@ -107,6 +107,7 @@ export default function Memory({ onScore, onFinish }) {
     }
     const next = ROUNDS[round + 1];
     setBetween(true);
+    setClosed(true);
     fx.sound('win');
     fx.say(`Case ${round + 1} cleared! Next, case ${round + 2}: ${next.hint}`, 'wow');
     later(() => {
@@ -114,6 +115,7 @@ export default function Memory({ onScore, onFinish }) {
       setMatched({});
       setSelected(null);
       setBetween(false);
+      setClosed(false);
     }, ROUND_BREAK_MS);
   };
 
@@ -134,7 +136,7 @@ export default function Memory({ onScore, onFinish }) {
       fx.burst(x, y, 20);
       fx.float(x, y - 20, '✓');
       fx.say(`${pick(['A match!', 'Great!', 'Sharp eyes!'])} ${pic.p.name}`, 'happy');
-      const nextMatched = { ...matched, [pic.pair]: Object.keys(matched).length + 1 };
+      const nextMatched = { ...matched, [pic.pair]: true };
       setMatched(nextMatched);
       if (Object.keys(nextMatched).length === deck.pics.length) roundCleared();
     } else {
@@ -167,7 +169,6 @@ export default function Memory({ onScore, onFinish }) {
           </span>
         </div>
       </div>
-      {between && <p className="mg-peek-banner">📌 Case {round + 2} coming up…</p>}
       <div className="mg-cork" ref={boardRef}>
         <div className={`mg-pmatch${between ? ' mg-pmatch--fade' : ''}`} key={round}>
           <div className="mg-pmatch__col">
@@ -213,6 +214,7 @@ export default function Memory({ onScore, onFinish }) {
             </div>
           </div>
         </div>
+        {closed && <p className="mg-cork__stamp">CASE CLOSED</p>}
         {/* strings run from pin centre to pin centre; the pins are drawn again on top so the string sits behind them */}
         <svg className="mg-cork__strings" aria-hidden="true">
           <defs>
@@ -222,12 +224,12 @@ export default function Memory({ onScore, onFinish }) {
               <stop offset="1" stopColor="#a82424" />
             </radialGradient>
           </defs>
-          {strings.map(({ pair, a, b, color }) => (
+          {strings.map(({ pair, a, b }) => (
             <path
               key={`${round}-${pair}`}
               d={`M${a.x} ${a.y} Q${(a.x + b.x) / 2} ${(a.y + b.y) / 2 + Math.hypot(b.x - a.x, b.y - a.y) * 0.12} ${b.x} ${b.y}`}
               pathLength="1"
-              stroke={color}
+              stroke="var(--string)"
             />
           ))}
           {strings.flatMap(({ pair, a, b }) => [a, b].map((p, k) => <circle key={`${round}-${pair}-${k}`} cx={p.x} cy={p.y} r="7" />))}
