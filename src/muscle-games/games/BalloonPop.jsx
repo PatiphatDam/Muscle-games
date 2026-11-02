@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { sample, shuffle } from './util.js';
 import { AirshipArt, CastleArt, SkyClouds, TownArt, WizardArt } from '../art.jsx';
-import { ICE, pick, useFx } from '../fx/Fx.jsx';
+import { pick, useFx } from '../fx/Fx.jsx';
 import { TimerBar, useCountdown } from '../components/Hud.jsx';
 import { scoreOutOf10 } from './meta.js';
 
@@ -110,14 +110,7 @@ function IceIcon() {
         ))}
       </g>
       <SkillPearl kind="ice" />
-      <g stroke="#fff" strokeLinecap="round" fill="none">
-        {[0, 60, 120].map((a) => (
-          <path key={a} d="M0 -6V6" strokeWidth="1.4" transform={`rotate(${a})`} />
-        ))}
-        {SIXTHS.map((a) => (
-          <path key={a} d="M-1.9 -4.7L0 -2.9L1.9 -4.7" strokeWidth="1.1" transform={`rotate(${a})`} />
-        ))}
-      </g>
+      <Snowflake r={6} width={1.4} color="#fff" />
       <PearlShine />
     </svg>
   );
@@ -141,6 +134,74 @@ function BombIcon() {
       <polygon className="mg-flyer__spark" points={FUSE_SPARK} fill="#fde047" />
       <PearlShine />
     </svg>
+  );
+}
+
+// a snow crystal of radius r round (0, 0): three crossing arms with a small V near each tip
+function Snowflake({ r, width, color }) {
+  const v = `M${(-r * 0.32).toFixed(2)} ${(-r * 0.78).toFixed(2)}L0 ${(-r * 0.48).toFixed(2)}L${(r * 0.32).toFixed(2)} ${(-r * 0.78).toFixed(2)}`;
+  return (
+    <g stroke={color} strokeLinecap="round" fill="none">
+      {[0, 60, 120].map((a) => (
+        <path key={a} d={`M0 ${-r}V${r}`} strokeWidth={width} transform={`rotate(${a})`} />
+      ))}
+      {SIXTHS.map((a) => (
+        <path key={a} d={v} strokeWidth={width * 0.8} transform={`rotate(${a})`} />
+      ))}
+    </g>
+  );
+}
+
+// Hitting the ice orb: it flashes white and shatters into twelve shards of ice that fly out, spin and fade. Drawn in
+// pixels round the hit point.
+const ICE_SHARDS = (() => {
+  const r = rng(7);
+  return Array.from({ length: 12 }, (_, k) => {
+    const a = (k / 12) * Math.PI * 2 + (r() - 0.5) * 0.4;
+    const d = 60 + r() * 60;
+    return { dx: Math.cos(a) * d, dy: Math.sin(a) * d + 20, rot: (r() - 0.5) * 480, s: 4 + r() * 5 };
+  });
+})();
+
+function IceShatter({ x, y }) {
+  return (
+    <svg className="mg-shatter" style={{ left: x, top: y }} viewBox="-130 -130 260 260" aria-hidden="true">
+      <circle className="mg-shatter__flash" r="18" fill="#fff" />
+      {ICE_SHARDS.map(({ dx, dy, rot, s }, k) => (
+        <polygon
+          key={k}
+          className="mg-shatter__shard"
+          points={`0,${(-s).toFixed(1)} ${(s * 0.5).toFixed(1)},${(s * 0.4).toFixed(1)} ${(-s * 0.4).toFixed(1)},${(s * 0.6).toFixed(1)}`}
+          fill={s > 6 ? '#e0f2fe' : '#7dd3fc'}
+          stroke="#fff"
+          strokeWidth="0.6"
+          style={{ '--dx': `${dx.toFixed(1)}px`, '--dy': `${dy.toFixed(1)}px`, '--rot': `${rot.toFixed(0)}deg` }}
+        />
+      ))}
+    </svg>
+  );
+}
+
+// While the ice spell lasts, frost creeps in from the sky's top corners (the castle wall hides the bottom ones): a
+// few snow crystals per corner, drawn for the top left and mirrored for the right.
+const FROST_FLAKES = [[14, 12, 9], [36, 28, 6], [58, 10, 7], [14, 40, 6], [80, 22, 4]];
+const FROST_CORNERS = { tl: '', tr: 'translate(96 0) scale(-1 1)' };
+
+function FrostCorners() {
+  return (
+    <div className="mg-frost" aria-hidden="true">
+      {Object.entries(FROST_CORNERS).map(([corner, flip]) => (
+        <svg key={corner} className={`mg-frost__corner mg-frost__corner--${corner}`} viewBox="0 0 96 56">
+          <g transform={flip}>
+            {FROST_FLAKES.map(([x, y, r], k) => (
+              <g key={k} transform={`translate(${x} ${y})`}>
+                <Snowflake r={r} width={1.6} color="#e0f2fe" />
+              </g>
+            ))}
+          </g>
+        </svg>
+      ))}
+    </div>
   );
 }
 
@@ -332,6 +393,36 @@ function ShockAura() {
   );
 }
 
+// Hitting the bomb orb: its red rune circle flies from the orb to a wrong balloon, clamps round it with a red flash,
+// and BOMB_FUSE s after the hit the balloon blows up in a shockwave, a fireball and sparks (see .mg-rider--bombed).
+// Drawn in the balloon art's own space like ShockAura; `from` is where the orb was, in that space.
+const BOMB_FUSE = 0.37;
+
+function BombLock({ from }) {
+  return (
+    <svg className="mg-aura mg-lock" viewBox="0 0 120 172" aria-hidden="true">
+      <g transform={`translate(${CAGE_MID[0]} ${CAGE_MID[1]})`}>
+        <circle className="mg-lock__flash" r="56" fill="#ef4444" />
+        <g className="mg-lock__ring" style={{ '--dx': `${from[0].toFixed(1)}px`, '--dy': `${from[1].toFixed(1)}px` }}>
+          <circle r="62" fill="none" stroke="#fca5a5" strokeWidth="4" />
+          {EIGHTHS.map((a) => (
+            <path key={a} d="M-6 -62L0 -76L6 -62Z" fill="#fde047" stroke="#7a1010" strokeWidth="1.2" transform={`rotate(${a})`} />
+          ))}
+          <circle r="54" fill="none" stroke="#fca5a5" strokeWidth="2" strokeDasharray="10 5" />
+        </g>
+        <circle className="mg-lock__wave" r="150" fill="none" stroke="#fca5a5" vectorEffect="non-scaling-stroke" />
+        <circle className="mg-lock__fire" r="94" fill="#f97316" fillOpacity="0.6" />
+        <circle className="mg-lock__fire" r="60" fill="#fde047" />
+        <g className="mg-lock__sparks" stroke="#fde047" strokeWidth="5" strokeLinecap="round">
+          {Array.from({ length: 10 }, (_, k) => (
+            <path key={k} d="M0 -40V-62" transform={`rotate(${k * 36})`} />
+          ))}
+        </g>
+      </g>
+    </svg>
+  );
+}
+
 function buildQuestions() {
   return sample(CLUES, ROUNDS).map((c, i) => {
     const pool = PROPERTIES.includes(c.answer) ? PROPERTIES : FUNCTIONS;
@@ -347,6 +438,10 @@ function buildQuestions() {
 
 function Round({ q, duration, assisted, fire, onHit, onWrong, onMiss, onSpecial }) {
   const [state, setState] = useState({});
+  const stateRef = useRef(state);
+  stateRef.current = state;
+  const riders = useRef({});
+  const [bombFrom, setBombFrom] = useState(null);
   const done = useRef(false);
   const [flyerGone, setFlyerGone] = useState(false);
   const flyerShot = useRef(false);
@@ -388,6 +483,9 @@ function Round({ q, duration, assisted, fire, onHit, onWrong, onMiss, onSpecial 
       {q.options.map((opt, k) => (
         <button
           key={opt}
+          ref={(el) => {
+            riders.current[opt] = el;
+          }}
           type="button"
           className={`mg-rider${state[opt] ? ` mg-rider--${state[opt]}` : ''}`}
           style={{ '--lane': k, '--dur': `${duration}s`, '--delay': `${delays[k]}s` }}
@@ -397,11 +495,12 @@ function Round({ q, duration, assisted, fire, onHit, onWrong, onMiss, onSpecial 
           }}
           onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && shoot(e.currentTarget, opt)}
           onAnimationEnd={(e) => landed(e, opt)}
-          disabled={['good', 'bad', 'gone', 'zapped'].includes(state[opt])}
+          disabled={['good', 'bad', 'gone', 'zapped', 'bombed'].includes(state[opt])}
         >
           <span className="mg-rider__balloon">
             <AirshipArt />
             {state[opt] === 'zapped' && <ShockAura />}
+            {state[opt] === 'bombed' && bombFrom && <BombLock from={bombFrom} />}
           </span>
           <span className="mg-rider__banner" lang="en">{opt}</span>
         </button>
@@ -417,14 +516,21 @@ function Round({ q, duration, assisted, fire, onHit, onWrong, onMiss, onSpecial 
             flyerShot.current = true;
             fire(e.currentTarget, (x, y) => {
               setFlyerGone(true);
-              // the bomb blows away one wrong balloon that is still in play
-              if (q.special === 'bomb') {
-                setState((st) => {
-                  const wrong = q.options.find((o) => o !== q.answer && !st[o]);
-                  return wrong ? { ...st, [wrong]: 'gone' } : st;
-                });
+              // the bomb's rune circle locks onto one wrong balloon that is still in play and blows it away; the
+              // blast is reported where that balloon is
+              const wrong = q.special === 'bomb' && q.options.find((o) => o !== q.answer && !stateRef.current[o]);
+              const art = wrong && riders.current[wrong]?.querySelector('.mg-rider__balloon');
+              if (art) {
+                const r = art.getBoundingClientRect();
+                const cx = r.left + r.width / 2;
+                const cy = r.top + (r.height * CAGE_MID[1]) / 172;
+                const k = 120 / r.width;
+                setBombFrom([(x - cx) * k, (y - cy) * k]);
+                setState((st) => ({ ...st, [wrong]: 'bombed' }));
+                onSpecial(q.special, cx, cy);
+              } else {
+                onSpecial(q.special, x, y);
               }
-              onSpecial(q.special, x, y);
             });
           }}
           aria-label={q.special === 'ice' ? 'Ice balloon: slows every balloon' : 'Bomb balloon: blows away one wrong balloon'}
@@ -447,6 +553,7 @@ export default function BalloonPop({ onScore, onFinish }) {
   const [assistFor, setAssistFor] = useState(-1);
   const [frozen, setFrozen] = useState(false);
   const [shake, setShake] = useState(false);
+  const [shatter, setShatter] = useState(null);
   // The wizard's last move ('cast' = fireball, 'atp' = ATP skill); n remounts him so the animation replays.
   const [wizardMove, setWizardMove] = useState({ n: 0, kind: '' });
   const skyRef = useRef(null);
@@ -570,7 +677,11 @@ export default function BalloonPop({ onScore, onFinish }) {
     if (kind === 'ice') {
       fx.sound('pop');
       fx.sound('freeze');
-      fx.burst(x, y, 24, ICE);
+      const sky = skyRef.current?.getBoundingClientRect();
+      if (sky) {
+        setShatter({ n: Date.now(), x: x - sky.left, y: y - sky.top });
+        later(() => setShatter(null), 1000);
+      }
       fx.say('Ice spell! Everything falls slower ❄️', 'wow');
       const setRate = (rate) =>
         skyRef.current?.getAnimations({ subtree: true }).forEach((a) => {
@@ -583,13 +694,15 @@ export default function BalloonPop({ onScore, onFinish }) {
         setFrozen(false);
       }, 3500);
     } else {
-      fx.sound('boom');
-      fx.vibrate([80, 40, 80]);
-      fx.burst(x, y, 26, ['#1f2937', '#f97316', '#fbbf24', '#ef4444']);
-      fx.float(x, y, '💥');
       fx.say('Boom! The bomb blew away a wrong balloon 💥', 'wow');
-      setShake(true);
-      later(() => setShake(false), 500);
+      // the blast lands when the rune circle has clamped round the balloon (see BombLock)
+      later(() => {
+        fx.sound('boom');
+        fx.vibrate([80, 40, 80]);
+        fx.burst(x, y, 26, ['#1f2937', '#f97316', '#fbbf24', '#ef4444']);
+        setShake(true);
+        later(() => setShake(false), 500);
+      }, BOMB_FUSE * 1000);
     }
   };
 
@@ -648,6 +761,8 @@ export default function BalloonPop({ onScore, onFinish }) {
             onSpecial={special}
           />
         )}
+        {frozen && <FrostCorners />}
+        {shatter && <IceShatter key={shatter.n} x={shatter.x} y={shatter.y} />}
         <div className="mg-castle" aria-hidden="true" />
         <div ref={wizardRef} key={`wizard${wizardMove.n}`} className={`mg-wizard${wizardMove.kind ? ` mg-wizard--${wizardMove.kind}` : ''}`} aria-hidden="true">
           <WizardArt />
