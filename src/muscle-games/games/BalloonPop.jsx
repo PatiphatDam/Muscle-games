@@ -228,102 +228,54 @@ function BadgeBolt() {
   );
 }
 
-// A zapped balloon's shock and exit, drawn in the balloon art's own space (120 x 172) so everything sits right on the
-// envelope's outline. The surge crackles are in the skill tube's style (cyan and yellow, white core, a small white
-// fork pointing out), three per pose at different places on the edge, while the art flickers in x-ray. Then, while
-// the art implodes (see .mg-rider--zapped), a four-point star twinkles in the envelope's middle, inside a yellow ring
-// that spreads and fades.
-const ENVELOPE_CURVES = [
-  [[60, 6], [98, 6], [114, 34], [112, 62]],
-  [[112, 62], [110, 90], [86, 108], [74, 118]],
-  [[46, 118], [34, 108], [10, 90], [8, 62]],
-  [[8, 62], [6, 34], [22, 6], [60, 6]],
-];
-// points round the envelope's outline (the flat mouth at the bottom is skipped), clockwise from the top
-const ENVELOPE_RIM = ENVELOPE_CURVES.flatMap(([p0, p1, p2, p3]) =>
-  Array.from({ length: 12 }, (_, k) => {
-    const t = k / 12;
-    const u = 1 - t;
-    const f = (i) => u * u * u * p0[i] + 3 * u * u * t * p1[i] + 3 * u * t * t * p2[i] + t * t * t * p3[i];
-    return [f(0), f(1)];
-  })
-);
-const ENVELOPE_MID = [60, 64];
+// A zapped balloon's shock, drawn in the balloon art's own space (120 x 172): an electric cage. Six points on a ring
+// round the envelope are joined by bolts in the skill tube's style (cyan and yellow in turn, white core, a small white
+// fork pointing out), and two of the points send a thin spark in to the middle. For 0.7 s the ring spins and closes
+// in, crushing the art with it (see .mg-rider--zapped); then a cyan and a yellow ring spread out from a white point.
+const CAGE_MID = [60, 64];
+const CAGE_R = 70;
+const CAGE_POINTS = Array.from({ length: 6 }, (_, k) => [
+  Math.cos((k * Math.PI) / 3) * CAGE_R,
+  Math.sin((k * Math.PI) / 3) * CAGE_R,
+]);
+const CAGE_POSES = [0, 1, 2].map((p) => ({
+  bolts: CAGE_POINTS.map(([x1, y1], k) => {
+    const [x2, y2] = CAGE_POINTS[(k + 1) % 6];
+    const spine = jagged(x1, y1, x2, y2, 5, 0.2, 61 + p * 10 + k);
+    // the fork leaves from the middle kink, pointing away from the cage's centre
+    const [mx, my] = spine[2];
+    const len = Math.hypot(mx, my) || 1;
+    const ux = mx / len;
+    const uy = my / len;
+    const fork = `M${mx.toFixed(1)} ${my.toFixed(1)} l${(ux * 8 - uy * 3).toFixed(1)} ${(uy * 8 + ux * 3).toFixed(1)} l${(ux * 5 + uy * 3).toFixed(1)} ${(uy * 5 - ux * 3).toFixed(1)}`;
+    return { spine, color: k % 2 ? 'yellow' : 'cyan', fork, w: 5.6 };
+  }),
+  sparks: [p, p + 3].map((k) =>
+    jagged(...CAGE_POINTS[k], 0, 0, 4, 0.2, 81 + p * 10 + k)
+      .map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`)
+      .join(' ')
+  ),
+}));
 
-function rimSpine(start, seed) {
-  const r = rng(seed);
-  return Array.from({ length: 8 }, (_, k) => {
-    const [x, y] = ENVELOPE_RIM[(start + k) % ENVELOPE_RIM.length];
-    const len = Math.hypot(x - ENVELOPE_MID[0], y - ENVELOPE_MID[1]);
-    const d = k === 0 || k === 7 ? 0 : (r() * 2 - 1) * 2.6;
-    return [x + ((x - ENVELOPE_MID[0]) / len) * d, y + ((y - ENVELOPE_MID[1]) / len) * d];
-  });
-}
-
-const ZAP_POSES = [0, 1, 2].map((p) =>
-  [0, 1, 2].map((k) => {
-    const spine = rimSpine((k * 16 + p * 6 + 3) % ENVELOPE_RIM.length, 41 + p * 5 + k);
-    const [mx, my] = spine[3];
-    const len = Math.hypot(mx - ENVELOPE_MID[0], my - ENVELOPE_MID[1]);
-    const ux = (mx - ENVELOPE_MID[0]) / len;
-    const uy = (my - ENVELOPE_MID[1]) / len;
-    const fork = `M${mx.toFixed(1)} ${my.toFixed(1)} l${(ux * 5 - uy * 2.5).toFixed(1)} ${(uy * 5 + ux * 2.5).toFixed(1)} l${(ux * 3.5 + uy * 2.5).toFixed(1)} ${(uy * 3.5 - ux * 2.5).toFixed(1)}`;
-    return { spine, color: (k + p) % 2 ? 'yellow' : 'cyan', fork, w: 4.4 };
-  })
-);
-
-// the final, big surge: six thicker crackles all round the edge per pose
-const ZAP_BIG_POSES = [0, 1, 2].map((p) =>
-  Array.from({ length: 6 }, (_, k) => {
-    const spine = rimSpine((k * 8 + p * 3) % ENVELOPE_RIM.length, 91 + p * 9 + k);
-    const [mx, my] = spine[3];
-    const len = Math.hypot(mx - ENVELOPE_MID[0], my - ENVELOPE_MID[1]);
-    const ux = (mx - ENVELOPE_MID[0]) / len;
-    const uy = (my - ENVELOPE_MID[1]) / len;
-    const fork = `M${mx.toFixed(1)} ${my.toFixed(1)} l${(ux * 6 - uy * 3).toFixed(1)} ${(uy * 6 + ux * 3).toFixed(1)} l${(ux * 4 + uy * 3).toFixed(1)} ${(uy * 4 - ux * 3).toFixed(1)}`;
-    return { spine, color: (k + p) % 2 ? 'yellow' : 'cyan', fork, w: 5.2 };
-  })
-);
-
-// the envelope's outline as one open path, mouth to mouth, for the sparks that race round it
-const ENVELOPE_RIM_PATH = 'M74 118 C86 108 110 90 112 62 C114 34 98 6 60 6 C22 6 6 34 8 62 C10 90 34 108 46 118';
-const ENVELOPE_PATH = `${ENVELOPE_RIM_PATH} Z`;
-
-// The skill tube's full-charge electricity, played on the balloon for 0.42 s as a charge-up: two sparks with tails
-// (cyan and yellow) race round the outline faster and faster, two small surges (a white flash, a burst of edge
-// crackles and a ring rippling out) build to one big surge with more crackles, a brighter flash and a wider ripple.
 function ShockAura() {
   return (
     <svg className="mg-aura" viewBox="0 0 120 172" aria-hidden="true">
-      <g className="mg-aura__run" fill="none" strokeLinecap="round">
-        <path d={ENVELOPE_RIM_PATH} pathLength="100" stroke="#67e8f9" strokeWidth="5" strokeDasharray="12 88" opacity="0.55" />
-        <path className="mg-aura__head" d={ENVELOPE_RIM_PATH} pathLength="100" stroke="#fff" strokeWidth="3.6" strokeDasharray="2 98" />
-        <path className="mg-aura__run-b" d={ENVELOPE_RIM_PATH} pathLength="100" stroke="#fde047" strokeWidth="5" strokeDasharray="12 88" opacity="0.55" />
-        <path className="mg-aura__head mg-aura__run-b" d={ENVELOPE_RIM_PATH} pathLength="100" stroke="#fff" strokeWidth="3.6" strokeDasharray="2 98" />
-      </g>
-      <path className="mg-aura__flash" d={ENVELOPE_PATH} fill="#fff" />
-      <ellipse className="mg-aura__ripple" cx={ENVELOPE_MID[0]} cy={ENVELOPE_MID[1]} rx="56" ry="60" fill="none" stroke="#67e8f9" strokeWidth="3" />
-      <g className="mg-aura__surge">
-        {ZAP_POSES.map((bolts, k) => (
-          <g key={k} className="mg-aura__pose" style={{ animationDelay: `${k * 0.04}s` }}>
-            {bolts.map((b, j) => (
-              <EdgeBolt key={j} {...b} />
-            ))}
-          </g>
-        ))}
-      </g>
-      <g className="mg-aura__big">
-        {ZAP_BIG_POSES.map((bolts, k) => (
-          <g key={k} className="mg-aura__pose" style={{ animationDelay: `${k * 0.04}s` }}>
-            {bolts.map((b, j) => (
-              <EdgeBolt key={j} {...b} />
-            ))}
-          </g>
-        ))}
-      </g>
-      <g transform={`translate(${ENVELOPE_MID[0]} ${ENVELOPE_MID[1]})`}>
-        <circle className="mg-aura__ring" r="50" fill="none" stroke="#fde047" strokeWidth="3" />
-        <polygon className="mg-aura__star" points="0,-34 5,-5 34,0 5,5 0,34 -5,5 -34,0 -5,-5" fill="#f0fdff" stroke="#22d3ee" strokeWidth="2" strokeLinejoin="round" />
+      <g transform={`translate(${CAGE_MID[0]} ${CAGE_MID[1]})`}>
+        <g className="mg-aura__cage">
+          {CAGE_POSES.map(({ bolts, sparks }, k) => (
+            <g key={k} className="mg-aura__pose" style={{ animationDelay: `${k * 0.04}s` }}>
+              {sparks.map((s, j) => (
+                <polyline key={j} points={s} fill="none" stroke="#a5f3fc" strokeWidth="2" strokeLinejoin="round" />
+              ))}
+              {bolts.map((b, j) => (
+                <EdgeBolt key={j} {...b} />
+              ))}
+            </g>
+          ))}
+        </g>
+        <circle className="mg-aura__wave" r="72" fill="none" stroke="#67e8f9" vectorEffect="non-scaling-stroke" />
+        <circle className="mg-aura__wave mg-aura__wave-b" r="43" fill="none" stroke="#fde047" vectorEffect="non-scaling-stroke" />
+        <circle className="mg-aura__dot" r="8" fill="#fff" />
       </g>
     </svg>
   );

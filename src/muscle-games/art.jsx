@@ -778,7 +778,7 @@ export function SkyClouds() {
 // A night raider's balloon in browns and dull cream, so it hides in the dark: the stripes swap colours at the iron
 // band (brown with cream stripes above, cream with brown stripes below), the canvas is patched, the flag is black
 // and ragged, the brass is dull, and a small lamp glows under the wooden gondola. Every balloon looks the same; the
-// answer banner tells them apart. The outline (AIR_ENVELOPE) is the one the zap effect in BalloonPop.jsx traces.
+// answer banner tells them apart. The zap effect in BalloonPop.jsx rings the envelope, centred at (60, 64).
 // Nothing inside it moves: animating the flag, ribbons or lamp made four balloons repaint every frame on phones.
 const AIR_ENVELOPE = 'M60 6 C98 6 114 34 112 62 C110 90 86 108 74 118 L46 118 C34 108 10 90 8 62 C6 34 22 6 60 6 Z';
 const AIR_GORES = 'M60 6C74 8 79 62 70 118L50 118C41 62 46 8 60 6ZM24 16C9 36 11 82 34 110L27 112C2 82 2 36 24 16ZM96 16C111 36 109 82 86 110L93 112C118 82 118 36 96 16Z';
