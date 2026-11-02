@@ -40,15 +40,17 @@ const PRAISE = ['Great spell! ✨', 'Bullseye!', 'Correct! 💪', 'Nice one!', '
 const OOPS = ['Oops! Not that one', 'So close, try another!', 'Wrong balloon 😅'];
 
 // Ice and bomb flyers are skill orbs: the same glossy pearl as the wizard's staff orb (dark at the top, pale at the
-// bottom, a white shine), tinted for the skill and wrapped in its element so it reads at a glance. Ice: a ring of
-// frost crystals spins round it and snow trails behind. Bomb: a flickering flame corona, a little lit bomb inside and
-// embers trailing behind. Drawn around (0, 0) in a 48 x 48 box; the trail points left, the way the orb came from.
+// bottom, a white shine), tinted for the skill and set in a spinning magic circle, like a spell he has just cast.
+// Ice: a pale-blue rune ring with six snowflake points round a frost-blue pearl with a white snowflake inside, and a ring
+// that pulses out. Bomb: a red rune ring spiked like a mine, spinning the other way, round a red pearl with a little
+// lit bomb inside, and a slow red warning pulse. Drawn around (0, 0) in a 48 x 48 box.
 const ORB_R = 11;
 const ORB_COLORS = {
   ice: ['#0b3a8a', '#38a8f5', '#bfe6ff', '#ffffff'],
   bomb: ['#7a1010', '#e0322b', '#ff9a6b', '#ffe0b0'],
 };
 const SIXTHS = [0, 60, 120, 180, 240, 300];
+const EIGHTHS = [0, 45, 90, 135, 180, 225, 270, 315];
 
 // a star with `n` points, as polygon points
 function star(x, y, outer, inner, n) {
@@ -95,17 +97,18 @@ function PearlShine() {
 function IceIcon() {
   return (
     <svg className="mg-flyer__icon" viewBox="-24 -24 48 48" aria-hidden="true">
-      <g className="mg-flyer__trail">
-        <circle cx="-18" cy="2" r="1.8" fill="#e0f2fe" />
-        <circle cx="-22" cy="-3" r="1.2" fill="#bae6fd" />
-        <circle cx="-21" cy="6" r="1" fill="#fff" />
-      </g>
-      <g className="mg-flyer__spin">
+      <circle className="mg-flyer__pulse" r="18" fill="none" stroke="#7dd3fc" strokeWidth="0.8" opacity="0.7" />
+      <g className="mg-flyer__rune">
+        <circle r="17" fill="none" stroke="#bae6fd" strokeWidth="1.2" />
+        <circle r="14.6" fill="none" stroke="#bae6fd" strokeWidth="0.6" strokeDasharray="1.2 1.6" />
         {SIXTHS.map((a) => (
-          <polygon key={a} points="0,-17 1.6,-14.6 0,-12.4 -1.6,-14.6" fill="#e0f2fe" stroke="#7dd3fc" strokeWidth="0.5" transform={`rotate(${a})`} />
+          <g key={a} transform={`rotate(${a}) translate(0 -17)`} stroke="#fff" strokeWidth="0.8" strokeLinecap="round">
+            <path d="M0 -2.4V2.4" />
+            <path d="M0 -2.4V2.4" transform="rotate(60)" />
+            <path d="M0 -2.4V2.4" transform="rotate(120)" />
+          </g>
         ))}
       </g>
-      <circle r="13.4" fill="none" stroke="#bae6fd" strokeWidth="1" strokeDasharray="2 3" opacity="0.8" />
       <SkillPearl kind="ice" />
       <g stroke="#fff" strokeLinecap="round" fill="none">
         {[0, 60, 120].map((a) => (
@@ -123,15 +126,13 @@ function IceIcon() {
 function BombIcon() {
   return (
     <svg className="mg-flyer__icon" viewBox="-24 -24 48 48" aria-hidden="true">
-      <g className="mg-flyer__trail">
-        <circle cx="-18" cy="3" r="1.8" fill="#fb923c" />
-        <circle cx="-22" cy="-2" r="1.2" fill="#fde047" />
-        <circle cx="-21" cy="7" r="1" fill="#f97316" />
-      </g>
-      <g className="mg-flyer__flames">
-        {[0, 45, 90, 135, 180, 225, 270, 315].map((a, k) => (
-          <path key={a} d={`M-3 -10Q0 ${k % 2 ? -20 : -17} 3 -10Z`} fill={k % 2 ? '#f97316' : '#fbbf24'} transform={`rotate(${a})`} />
+      <circle className="mg-flyer__pulse" r="18" fill="#ef4444" opacity="0.25" />
+      <g className="mg-flyer__rune mg-flyer__rune--back">
+        <circle r="15.6" fill="none" stroke="#fca5a5" strokeWidth="1.2" />
+        {EIGHTHS.map((a) => (
+          <path key={a} d="M-1.8 -15.4L0 -19.6L1.8 -15.4Z" fill="#fde047" stroke="#7a1010" strokeWidth="0.4" transform={`rotate(${a})`} />
         ))}
+        <circle r="13.6" fill="none" stroke="#fca5a5" strokeWidth="0.6" strokeDasharray="3 1.4" />
       </g>
       <SkillPearl kind="bomb" />
       <path d="M2.5 -4q1.5 -2.7 4 -2.1" stroke="#1f1f23" strokeWidth="1.05" fill="none" strokeLinecap="round" />

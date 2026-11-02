@@ -601,17 +601,14 @@
 /* the invisible ring keeps a 44px tap target */
 .mg-flyer::after { content: ''; position: absolute; inset: calc((var(--size) - var(--tap)) / 2); border-radius: 50%; }
 .mg-flyer__icon { display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
-/* flying right to left, the orb turns round so its trail stays behind it */
 .mg-flyer--rev { animation-direction: reverse; animation-fill-mode: both; }
-.mg-flyer--rev .mg-flyer__icon { transform: scaleX(-1); }
-/* the skill orbs' element: snow or embers drift off behind, frost crystals spin, flames flicker, the fuse twinkles */
-.mg-flyer__trail { animation: mg-flyer-trail 0.5s linear infinite; }
-.mg-flyer__spin { animation: mg-flyer-spin 4s linear infinite; }
-.mg-flyer__flames { animation: mg-flyer-flick 0.16s steps(2) infinite; }
+/* the skill orbs' magic circle spins (the bomb's the other way), a ring pulses round it and the fuse twinkles */
+.mg-flyer__rune { animation: mg-flyer-spin 4s linear infinite; }
+.mg-flyer__rune--back { animation-duration: 6s; animation-direction: reverse; }
+.mg-flyer__pulse { animation: mg-flyer-pulse 1s ease-in-out infinite; }
 .mg-flyer__spark { transform-box: fill-box; transform-origin: center; animation: mg-flyer-spark 1.2s ease-in-out infinite; }
-@keyframes mg-flyer-trail { from { transform: none; opacity: 1; } to { transform: translateX(-10px); opacity: 0; } }
 @keyframes mg-flyer-spin { to { transform: rotate(360deg); } }
-@keyframes mg-flyer-flick { 50% { transform: scale(1.06, 0.94); } }
+@keyframes mg-flyer-pulse { 50% { transform: scale(1.12); opacity: 0.3; } }
 @keyframes mg-flyer-spark { 0%, 100% { transform: scale(0.5); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } }
 @keyframes mg-fly { 0% { left: -80px; transform: translateY(0); } 25% { transform: translateY(-14px); } 50% { transform: translateY(8px); } 75% { transform: translateY(-10px); } 100% { left: calc(100% + 20px); transform: translateY(0); } }
 
