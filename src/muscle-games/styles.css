@@ -512,20 +512,15 @@
   border: 1px solid var(--border);
   transition: filter 0.3s;
 }
-.mg-sky--frozen { filter: hue-rotate(-40deg) saturate(1.3); box-shadow: inset 0 0 0 4px #bae6fd, inset 0 0 40px #e0f2fe; }
+.mg-sky--frozen { box-shadow: inset 0 0 0 4px #bae6fd, inset 0 0 40px #e0f2fe; }
 /* while frozen the balloons turn pale and frosty */
 .mg-sky--frozen .mg-rider:not(.mg-rider--aim) .mg-rider__balloon { filter: saturate(0.55) brightness(1.15) drop-shadow(0 0 3px #e0f2fe); }
-/* the ice orb shattering (0.9 s), and frost growing in from the top corners while the spell lasts */
+/* the ice orb shattering (0.9 s) */
 .mg-shatter { position: absolute; z-index: 8; width: 260px; height: 260px; margin: -130px 0 0 -130px; overflow: visible; pointer-events: none; }
 .mg-shatter__flash { transform-origin: 0 0; animation: mg-shatter-flash 0.15s ease-out forwards; }
 .mg-shatter__shard { animation: mg-shatter-shard 0.9s cubic-bezier(0.2, 0.7, 0.4, 1) forwards; }
 @keyframes mg-shatter-flash { to { transform: scale(2); opacity: 0; } }
 @keyframes mg-shatter-shard { 60% { opacity: 1; } 100% { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity: 0; } }
-.mg-frost { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
-.mg-frost__corner { position: absolute; width: 144px; height: 84px; opacity: 0.85; animation: mg-frost-in 0.9s ease-out both; }
-.mg-frost__corner--tl { top: 0; left: 0; transform-origin: 0 0; }
-.mg-frost__corner--tr { top: 0; right: 0; transform-origin: 100% 0; }
-@keyframes mg-frost-in { from { transform: scale(0); } }
 .mg-sky__moon { position: absolute; top: 18px; right: 22px; width: 54px; height: 54px; border-radius: 50%; background: radial-gradient(circle at 38% 36%, #fffbeb, #fde68a 70%); box-shadow: 0 0 30px rgba(253, 230, 138, 0.55); }
 /* Clouds drift in a band just above the castle's rooftops. They pass over the castle, town and wizard
    (z-index 4) but stay under the balloons (5), the wizard (6) and his wall (7), the ATP button and the fireballs (8). */
@@ -562,63 +557,19 @@
 .mg-rider--good { animation: mg-fall var(--dur) linear var(--delay) forwards, mg-burst 0.3s ease-out forwards; animation-play-state: paused, running; }
 .mg-rider--bad { animation: mg-fall var(--dur) linear var(--delay) forwards, mg-fizzle 0.4s ease-out forwards; animation-play-state: paused, running; }
 .mg-rider--gone { animation: mg-fall var(--dur) linear var(--delay) forwards, mg-gone 0.5s ease-out forwards; }
-/* a zapped balloon: an electric cage closes on it. For 0.7 s the ring of bolts spins and shrinks while the art,
-   flickering between itself and an x-ray negative every 25 ms, is crushed and spun with it, and the sign fades; then
-   a cyan and a yellow ring spread out from a white point (0.3 s) */
-.mg-rider--zapped { animation: mg-fall var(--dur) linear var(--delay) forwards; }
-.mg-rider--zapped .mg-rider__balloon > svg:not(.mg-aura) {
-  transform-origin: 50% 37.2%;
-  animation: mg-cage-crush 0.7s linear forwards, mg-cage-flicker 0.05s steps(1) 14;
+/* a balloon marked by the ATP ultimate waits (disabled) for its bolt; struck, it flickers between itself and an
+   x-ray negative for 0.4 s while the bolt hits, then bursts (see UltStrike) */
+.mg-rider--struck .mg-air { transform-origin: 50% 37.2%; animation: mg-struck-flicker 0.05s steps(1) 8, mg-skill-pop 0.12s ease-in 0.4s forwards; }
+.mg-rider--struck .mg-rider__banner { animation: mg-banner-out 0.1s linear 0.4s forwards; }
+@keyframes mg-struck-flicker {
+  0% { filter: grayscale(1) invert(1) brightness(1.3) drop-shadow(0 0 6px #fbbf24); }
+  50% { filter: brightness(2.2) drop-shadow(0 0 6px #60a5fa); }
 }
-.mg-rider--zapped .mg-rider__banner { animation: mg-banner-out 0.44s linear forwards; }
-@keyframes mg-cage-crush {
-  0% { transform: none; }
-  99.9% { transform: scale(0.1) rotate(200deg); opacity: 1; }
-  100% { transform: scale(0.1) rotate(200deg); opacity: 0; }
-}
-@keyframes mg-cage-flicker {
-  0% { filter: grayscale(1) invert(1) sepia(1) saturate(5) hue-rotate(140deg); }
-  50% { filter: brightness(2.4); }
-}
+/* a bombed balloon: the fire pillar reaches it at BOMB_FUSE (0.73 s) and it is gone (see FirePortal) */
+.mg-rider--bombed .mg-air { transform-origin: 50% 37.2%; animation: mg-skill-pop 0.1s ease-in 0.73s forwards; }
+.mg-rider--bombed .mg-rider__banner { animation: mg-banner-out 0.1s linear 0.73s forwards; }
+@keyframes mg-skill-pop { to { transform: scale(1.25); opacity: 0; } }
 @keyframes mg-banner-out { to { opacity: 0; } }
-/* laid exactly over the balloon art, in its own 120 x 172 space; the cage's poses flip every 40 ms */
-.mg-aura { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
-.mg-aura__cage { transform-origin: 0 0; animation: mg-aura-cage 0.7s linear forwards; }
-.mg-aura__pose { opacity: 0; animation: mg-aura-pose 0.12s steps(1) infinite; }
-.mg-aura__wave, .mg-aura__dot { opacity: 0; transform-origin: 0 0; }
-.mg-aura__wave { animation: mg-aura-wave 0.3s linear 0.7s forwards; }
-.mg-aura__wave-b { animation-name: mg-aura-wave-b; }
-.mg-aura__dot { animation: mg-aura-dot 0.3s linear 0.7s forwards; }
-@keyframes mg-aura-cage {
-  0% { transform: none; }
-  99.9% { transform: rotate(286deg) scale(0.15); opacity: 1; }
-  100% { transform: rotate(286deg) scale(0.15); opacity: 0; }
-}
-@keyframes mg-aura-pose { 0% { opacity: 1; } 33.34%, 100% { opacity: 0; } }
-@keyframes mg-aura-wave { 0% { opacity: 1; transform: scale(0.17); stroke-width: 3.5; } 100% { opacity: 0; transform: none; stroke-width: 0.5; } }
-@keyframes mg-aura-wave-b { 0% { opacity: 1; transform: scale(0.17); stroke-width: 2.5; } 100% { opacity: 0; transform: none; stroke-width: 0.5; } }
-@keyframes mg-aura-dot { 0% { opacity: 1; transform: none; } 100% { opacity: 1; transform: scale(0); } }
-/* a bombed balloon: the bomb orb's rune circle flies in from the orb (0.25 s) and clamps round it with a red flash
-   (0.12 s); then the balloon pops and a shockwave, a fireball and sparks spread out (0.4 s) */
-.mg-rider--bombed .mg-rider__balloon > svg:not(.mg-aura) { animation: mg-bomb-pop 0.1s ease-in 0.37s forwards; }
-.mg-rider--bombed .mg-rider__banner { animation: mg-banner-out 0.1s linear 0.37s forwards; }
-@keyframes mg-bomb-pop { to { transform: scale(1.25); opacity: 0; } }
-.mg-lock__ring { animation: mg-lock-ring 0.37s linear forwards; }
-@keyframes mg-lock-ring {
-  0% { transform: translate(var(--dx), var(--dy)) scale(0.45); animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1); }
-  67.5% { transform: rotate(-120deg) scale(1.15); animation-timing-function: ease-in; }
-  99% { transform: rotate(-170deg) scale(0.9); opacity: 1; }
-  100% { transform: rotate(-170deg) scale(0.9); opacity: 0; }
-}
-.mg-lock__flash { opacity: 0; animation: mg-lock-flash 0.37s steps(1) forwards; }
-@keyframes mg-lock-flash { 0% { opacity: 0; } 68% { opacity: 0.45; } 84% { opacity: 0.1; } 92% { opacity: 0.45; } 100% { opacity: 0; } }
-.mg-lock__wave, .mg-lock__fire, .mg-lock__sparks { opacity: 0; transform-origin: 0 0; animation: 0.4s ease-out 0.37s forwards; }
-.mg-lock__wave { animation-name: mg-lock-wave; }
-.mg-lock__fire { animation-name: mg-lock-fire; }
-.mg-lock__sparks { animation-name: mg-lock-sparks; }
-@keyframes mg-lock-wave { 0% { opacity: 1; transform: scale(0.07); stroke-width: 6; } 100% { opacity: 0; transform: none; stroke-width: 0.5; } }
-@keyframes mg-lock-fire { 0% { opacity: 1; transform: scale(0.1); } 100% { opacity: 0; transform: none; } }
-@keyframes mg-lock-sparks { 0% { opacity: 1; transform: scale(0.5); } 100% { opacity: 0; transform: scale(1.6); } }
 .mg-rider:disabled { cursor: default; }
 .mg-rider:focus-visible .mg-rider__balloon { outline: 3px solid #fde68a; outline-offset: 2px; border-radius: 12px; }
 @keyframes mg-fall { from { top: -45%; } to { top: 100%; } }
@@ -645,6 +596,113 @@
 @keyframes mg-flyer-pulse { 50% { transform: scale(1.12); opacity: 0.3; } }
 @keyframes mg-flyer-spark { 0%, 100% { transform: scale(0.5); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } }
 @keyframes mg-fly { 0% { left: -80px; transform: translateY(0); } 25% { transform: translateY(-14px); } 50% { transform: translateY(8px); } 75% { transform: translateY(-10px); } 100% { left: calc(100% + 20px); transform: translateY(0); } }
+
+/* ---------- Balloon Pop: rune skills (BalloonSkills.jsx) ---------- */
+.mg-rune { display: block; width: 100%; height: 100%; overflow: visible; }
+.mg-spin { display: block; width: 100%; height: 100%; animation: mg-rune-spin 6s linear infinite; }
+.mg-spin--back { animation-direction: reverse; }
+.mg-spin--slow { animation-duration: 40s; }
+.mg-spin--fast { animation-duration: 1.2s; }
+@keyframes mg-rune-spin { to { transform: rotate(360deg); } }
+/* lightning: a bolt's box is stretched and turned from one point to another; its poses flip every 40 ms */
+.mg-bolt { position: absolute; height: 40px; margin-top: -20px; transform-origin: 0 50%; pointer-events: none; }
+.mg-bolt__art { display: block; width: 100%; height: 100%; overflow: visible; }
+.mg-bolt__pose { opacity: 0; animation: mg-bolt-pose 0.12s steps(1) infinite; }
+@keyframes mg-bolt-pose { 0% { opacity: 1; } 33.34%, 100% { opacity: 0; } }
+
+/* The rune at the wizard's feet lies flat on the wall behind him while he casts (1.6 s); for the ultimate it is bigger,
+   stays 2.6 s and three more rise round him, one after another. */
+.mg-feet { --fs: 0.75; position: absolute; bottom: 58px; z-index: 6; width: 0; height: 0; pointer-events: none; }
+.mg-feet--volt { --fs: 1; }
+.mg-feet__base, .mg-feet__ring { position: absolute; left: -78px; top: -78px; width: 156px; height: 156px; }
+.mg-feet__base { animation: mg-feet-base 1.6s ease-out both; }
+.mg-feet--volt .mg-feet__base { animation-duration: 2.6s; }
+.mg-feet__ring { --rs: calc(0.8 - var(--k) * 0.1); opacity: 0; animation: mg-feet-ring 0.8s ease-out calc(0.15s + var(--k) * 0.16s) forwards; }
+@keyframes mg-feet-base {
+  0% { transform: scale(0); }
+  15% { transform: scale(var(--fs), calc(var(--fs) * 0.28)); }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: scale(var(--fs), calc(var(--fs) * 0.28)); }
+}
+@keyframes mg-feet-ring {
+  0% { opacity: 0; transform: scale(var(--rs), calc(var(--rs) * 0.25)); }
+  20% { opacity: 0.95; }
+  100% { opacity: 0; transform: translateY(-160px) scale(var(--rs), calc(var(--rs) * 0.25)); }
+}
+
+/* Ice: the rune leaves the staff 0.25 s after the hit, reaches the middle of the sky behind the balloons at
+   ICE_FREEZE (0.67 s), opens across it by 1.17 s, holds, and fades out over the last 0.6 s. */
+.mg-sigil { position: absolute; left: 0; top: 0; z-index: 4; pointer-events: none; animation: mg-sigil 3.02s linear 0.25s both; }
+@keyframes mg-sigil {
+  0% { opacity: 0; transform: translate(var(--x0), var(--y0)) scale(var(--s0)); animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1); }
+  2% { opacity: 1; }
+  13.9% { transform: translate(var(--x1), var(--y1)) scale(var(--s1)); animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1); }
+  30.5% { opacity: 0.9; transform: translate(var(--x1), var(--y1)) scale(1); }
+  80.1% { opacity: 0.9; }
+  100% { opacity: 0; transform: translate(var(--x1), var(--y1)) scale(1); }
+}
+
+/* Bomb: inside the balloon, the fire rune leaves the staff at 0.25 s, flattens into a portal above the balloon by
+   0.65 s, and drops a pillar of fire that reaches the balloon at BOMB_FUSE (0.73 s); embers rise as it burns away. */
+.mg-portal { position: absolute; left: 50%; top: 37.2%; width: 0; height: 0; pointer-events: none; }
+.mg-portal__rune { position: absolute; left: -36px; top: -36px; width: 72px; height: 72px; animation: mg-portal-rune 0.9s linear 0.25s both; }
+@keyframes mg-portal-rune {
+  0% { opacity: 1; transform: translate(var(--fx), var(--fy)) scale(0.3); animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1); }
+  28.9% { transform: translate(0, var(--lift)) scale(0.56, 0.2); animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1); }
+  44.4% { transform: translate(0, var(--lift)) scale(1, 0.35); }
+  77.8% { opacity: 1; }
+  100% { opacity: 0; transform: translate(0, var(--lift)) scale(1, 0.35); }
+}
+.mg-portal__pillar {
+  position: absolute; left: -13px; top: var(--lift); width: 26px; height: 900px; transform-origin: 50% 0; opacity: 0;
+  background: linear-gradient(90deg, transparent, #f97316 20%, #fde047 38% 62%, #f97316 80%, transparent);
+  animation: mg-portal-pillar 0.48s ease-out 0.67s forwards;
+}
+@keyframes mg-portal-pillar {
+  0% { opacity: 1; transform: scaleY(0); }
+  23% { transform: none; }
+  62% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: scaleX(0.15); }
+}
+.mg-portal__ember { position: absolute; left: -2px; top: -2px; width: 4px; height: 4px; border-radius: 50%; background: #fde047; opacity: 0; animation: mg-portal-ember 0.5s ease-out 0.73s forwards; }
+.mg-portal__ember:nth-of-type(even) { background: #fb923c; }
+@keyframes mg-portal-ember {
+  0% { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc((var(--k) - 3.5) * 6px), calc(-40px - var(--k) * 4px)) scale(0.4); }
+}
+
+/* The ATP ultimate, Heaven's seal (2.6 s): the sky dims, a bolt climbs from the staff and the lightning rune opens high
+   in the sky behind the balloons (0.25-0.7 s); its five small circles charge one by one; at ULT_STRIKE (1.15 s) the
+   sky flashes and two bolts come down (inside the balloons, below); everything fades from 2.1 s. */
+.mg-ult { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
+.mg-ult__dim { position: absolute; inset: 0; background: #0a0714; opacity: 0; animation: mg-ult-dim 2.6s linear forwards; }
+@keyframes mg-ult-dim { 11.5%, 80.8% { opacity: 0.5; } 96%, 100% { opacity: 0; } }
+.mg-ult__rune { position: absolute; opacity: 0; animation: mg-ult-rune 2.6s linear forwards; }
+@keyframes mg-ult-rune {
+  0%, 9.6% { opacity: 0; transform: scale(var(--s0)); animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1); }
+  10% { opacity: 1; }
+  26.9% { transform: none; }
+  80.8% { opacity: 1; }
+  100% { opacity: 0; transform: none; }
+}
+.mg-ult__charge { opacity: 0; animation: mg-ult-charge 1.2s ease-out calc(0.7s + var(--k) * 0.09s) forwards; }
+@keyframes mg-ult-charge { 10%, 100% { opacity: 0.55; } }
+.mg-ult__up .mg-bolt__art { transform-origin: 0 50%; animation: mg-ult-up 0.6s ease-out forwards; }
+@keyframes mg-ult-up { 0% { transform: scaleX(0); } 75% { opacity: 1; transform: none; } 100% { opacity: 0; transform: none; } }
+.mg-ult-flash { position: absolute; inset: 0; z-index: 9; pointer-events: none; background: #fffbeb; opacity: 0; animation: mg-ult-flash 0.25s linear 1.15s forwards; }
+@keyframes mg-ult-flash { 0% { opacity: 0.75; } 100% { opacity: 0; } }
+/* inside a struck balloon: the bolt holds 0.4 s, then a gold and blue blast */
+.mg-strike { position: absolute; left: 50%; top: 37.2%; width: 0; height: 0; pointer-events: none; }
+.mg-strike__bolt .mg-bolt__art { animation: mg-strike-bolt 0.45s linear forwards; }
+@keyframes mg-strike-bolt { 88% { opacity: 1; } 100% { opacity: 0; } }
+.mg-blast { position: absolute; left: -100px; top: -100px; width: 200px; height: 200px; overflow: visible; }
+.mg-blast__wave, .mg-blast__fire, .mg-blast__sparks { opacity: 0; transform-origin: 0 0; animation: 0.45s ease-out 0.4s forwards; }
+.mg-blast__wave { animation-name: mg-blast-wave; }
+.mg-blast__fire { animation-name: mg-blast-fire; }
+.mg-blast__sparks { animation-name: mg-blast-sparks; }
+@keyframes mg-blast-wave { 0% { opacity: 1; transform: scale(0.1); stroke-width: 6; } 100% { opacity: 0; transform: none; stroke-width: 0.5; } }
+@keyframes mg-blast-fire { 0% { opacity: 1; transform: scale(0.15); } 100% { opacity: 0; transform: none; } }
+@keyframes mg-blast-sparks { 0% { opacity: 1; transform: scale(0.5); } 100% { opacity: 0; transform: scale(1.8); } }
 
 /* Castle backdrop: a far, faded layer (mirrored) behind a near shadow layer. */
 /* Sized by height so the castle and the town strip share one scale (110/290 of the castle's height). */
@@ -718,27 +776,40 @@
 @keyframes mg-arm-cast { 16% { transform: rotate(7deg); } 42% { transform: rotate(-42deg); } 58% { transform: rotate(-32deg); } 80% { transform: rotate(3deg); } }
 @keyframes mg-staff-swing { 16% { transform: rotate(6deg); } 42% { transform: rotate(12deg); } 58% { transform: rotate(-26deg); } 80% { transform: rotate(4deg); } }
 @keyframes mg-orb-red { 8%, 70% { opacity: 1; } }
-/* ATP skill: the arm lifts and the staff stays upright, held high; the pearl turns cyan to yellow, its glow pulses cyan and yellow and two rings
-   spread out from it. */
+/* Casting a skill: the arm lifts and the staff stays upright, held high; the pearl takes the skill's colour (blue for
+   ice, red for fire, gold to blue for the ATP ultimate), its glow pulses and rings spread out from it. */
 .mg-wizard__ring { transform-box: fill-box; transform-origin: center; }
-/* The staff's runes glow on and off; the ribbon sways under the head. In the skill the runes flash yellow. */
+/* The staff's runes glow on and off; the ribbon sways under the head. In the ultimate the runes flash gold. */
 .mg-wizard__runes { animation: mg-runes 2.4s ease-in-out infinite; }
 .mg-wizard .mg-wizard__ribbon { transform-box: view-box; transform-origin: 158px 88px; animation: mg-ribbon 2.2s ease-in-out infinite; }
-.mg-wizard--atp .mg-wizard__runes { animation: mg-runes-flash 0.35s ease-in-out 4; }
+.mg-wizard--ult .mg-wizard__runes { animation: mg-runes-flash 0.35s ease-in-out 6; }
 @keyframes mg-runes { 50% { opacity: 0.35; } }
 @keyframes mg-runes-flash { 50% { stroke: #facc15; } }
 @keyframes mg-ribbon { 50% { transform: rotate(7deg); } }
-.mg-wizard--atp .mg-wizard__arm { animation: mg-arm-power 1.4s ease-in-out; }
-.mg-wizard--atp .mg-wizard__staff { animation: mg-staff-power 1.4s ease-in-out; }
-.mg-wizard--atp .mg-wizard__orb-atp { animation: mg-orb-atp 1.4s ease-in-out; }
-.mg-wizard--atp .mg-wizard__glow { animation: mg-glow-atp 1.4s ease-in-out; }
-.mg-wizard--atp .mg-wizard__ring { animation: mg-orb-ring 0.7s ease-out 0.25s 2; }
+.mg-wizard--ice .mg-wizard__arm, .mg-wizard--fire .mg-wizard__arm { animation: mg-arm-power 1.5s ease-in-out; }
+.mg-wizard--ice .mg-wizard__staff, .mg-wizard--fire .mg-wizard__staff { animation: mg-staff-power 1.5s ease-in-out; }
+.mg-wizard--ice .mg-wizard__orb-ice, .mg-wizard--fire .mg-wizard__orb-red { animation: mg-orb-skill 1.5s ease-in-out; }
+.mg-wizard--ice .mg-wizard__glow { animation: mg-glow-ice 1.5s ease-in-out; }
+.mg-wizard--fire .mg-wizard__glow { animation: mg-glow-fire 1.5s ease-in-out; }
+.mg-wizard--ice .mg-wizard__ring, .mg-wizard--fire .mg-wizard__ring { animation: mg-orb-ring 0.6s ease-out 0.2s 2; }
+.mg-wizard--ice .mg-wizard__ring { stroke: #bae6fd; }
+.mg-wizard--fire .mg-wizard__ring { stroke: #fdba74; }
+.mg-wizard--ult .mg-wizard__arm { animation: mg-arm-ult 2.2s ease-in-out; }
+.mg-wizard--ult .mg-wizard__staff { animation: mg-staff-ult 2.2s ease-in-out; }
+.mg-wizard--ult .mg-wizard__orb-volt { animation: mg-orb-ult 2.2s ease-in-out; }
+.mg-wizard--ult .mg-wizard__glow { animation: mg-glow-ult 2.2s ease-in-out; }
+.mg-wizard--ult .mg-wizard__ring { stroke: #fde68a; animation: mg-orb-ring 0.55s ease-out 0.1s 4; }
 @keyframes mg-arm-power { 18%, 75% { transform: rotate(-32deg); } }
 @keyframes mg-staff-power { 18%, 75% { transform: rotate(28deg); } }
-@keyframes mg-orb-atp { 15%, 80% { opacity: 1; } }
-@keyframes mg-glow-atp {
-  15%, 55% { fill: #22d3ee; opacity: 0.5; transform: scale(1.6); }
-  35%, 75% { fill: #facc15; opacity: 0.5; transform: scale(1.9); }
+@keyframes mg-arm-ult { 12%, 82% { transform: rotate(-32deg); } }
+@keyframes mg-staff-ult { 12%, 82% { transform: rotate(28deg); } }
+@keyframes mg-orb-skill { 15%, 80% { opacity: 1; } }
+@keyframes mg-orb-ult { 8%, 85% { opacity: 1; } }
+@keyframes mg-glow-ice { 15%, 75% { fill: #7dd3fc; opacity: 0.55; transform: scale(1.8); } }
+@keyframes mg-glow-fire { 15%, 75% { fill: #fb923c; opacity: 0.55; transform: scale(1.8); } }
+@keyframes mg-glow-ult {
+  10%, 40%, 70% { fill: #fbbf24; opacity: 0.6; transform: scale(2); }
+  25%, 55%, 85% { fill: #60a5fa; opacity: 0.5; transform: scale(2.3); }
 }
 @keyframes mg-orb-ring { 0% { opacity: 0.9; transform: scale(1); } 100% { opacity: 0; transform: scale(3); } }
 @keyframes mg-orb-aura { 20%, 45% { fill: #e0322b; opacity: 0.45; transform: scale(1.5); } }

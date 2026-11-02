@@ -414,11 +414,17 @@ export function WizardShapes() {
           <stop offset=".85" stopColor="#ff8f7e" />
           <stop offset="1" stopColor="#ffd2c9" />
         </linearGradient>
-        <linearGradient id="mg-orb-atp" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#0b7fc4" />
-          <stop offset=".45" stopColor="#38d6f5" />
-          <stop offset=".8" stopColor="#fde68a" />
-          <stop offset="1" stopColor="#facc15" />
+        <linearGradient id="mg-orb-ice" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#0b3a8a" />
+          <stop offset=".5" stopColor="#38a8f5" />
+          <stop offset=".85" stopColor="#bfe6ff" />
+          <stop offset="1" stopColor="#fff" />
+        </linearGradient>
+        <linearGradient id="mg-orb-volt" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#78350f" />
+          <stop offset=".5" stopColor="#fbbf24" />
+          <stop offset=".85" stopColor="#60a5fa" />
+          <stop offset="1" stopColor="#fffbeb" />
         </linearGradient>
         <radialGradient id="mg-orb-shade" cx=".42" cy=".38" r=".64">
           <stop offset=".55" stopColor="#2e3358" stopOpacity="0" />
@@ -475,11 +481,12 @@ export function WizardShapes() {
         <path d="M161 44Q157 30 161 14Q165 30 161 44Z" fill={W.gold} />
         <circle cx="161" cy="54" r="17" fill="#ece9ff" opacity=".18" />
         <circle className="mg-wizard__ring" cx="161" cy="54" r="12" fill="none" stroke="#67e8f9" strokeWidth="2" opacity="0" />
-        {/* a glossy pearl: white, darker at the top and lighter at the bottom; red (cast) and cyan-to-yellow (ATP)
-            layers fade in over it, then the edge shading, the bounce light and the highlights sit on top */}
+        {/* a glossy pearl: white, darker at the top and lighter at the bottom; red (cast, fire skill), blue (ice skill) and
+            gold-to-blue (ATP ultimate) layers fade in over it, then the edge shading, the bounce light and the highlights sit on top */}
         <circle className="mg-wizard__orb" cx="161" cy="54" r="12" fill="url(#mg-orb-white)" />
         <circle className="mg-wizard__orb-red" cx="161" cy="54" r="12" fill="url(#mg-orb-red)" opacity="0" />
-        <circle className="mg-wizard__orb-atp" cx="161" cy="54" r="12" fill="url(#mg-orb-atp)" opacity="0" />
+        <circle className="mg-wizard__orb-ice" cx="161" cy="54" r="12" fill="url(#mg-orb-ice)" opacity="0" />
+        <circle className="mg-wizard__orb-volt" cx="161" cy="54" r="12" fill="url(#mg-orb-volt)" opacity="0" />
         <circle cx="161" cy="54" r="12" fill="url(#mg-orb-shade)" />
         <ellipse cx="161" cy="61.6" rx="7" ry="2.4" fill="#fff" opacity=".5" />
         <ellipse cx="156.6" cy="48.6" rx="4.6" ry="3" transform="rotate(-35 156.6 48.6)" fill="#fff" opacity=".95" />
