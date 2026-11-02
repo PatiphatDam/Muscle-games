@@ -199,24 +199,18 @@ function Bolt({ x, y, toX, toY, color, width, className }) {
   );
 }
 
-// ---------- the wizard's feet ----------
-// While he casts, a flat rune spins on the wall at his feet; for the ultimate three more rise round him.
-export function FeetRunes({ kind, x, rings }) {
+// ---------- round the wizard ----------
+// For the ultimate, three flat lightning runes rise round him one after another, from the wall at his feet.
+export function RisingRunes({ x }) {
   return (
-    <div className={`mg-feet mg-feet--${kind}`} style={{ left: x }} aria-hidden="true">
-      <div className="mg-feet__base">
-        <div className="mg-spin">
-          <Rune kind={kind} />
-        </div>
-      </div>
-      {rings &&
-        [0, 1, 2].map((k) => (
-          <div key={k} className="mg-feet__ring" style={{ '--k': k }}>
-            <div className={`mg-spin${k % 2 ? ' mg-spin--back' : ''}`}>
-              <Rune kind={kind} />
-            </div>
+    <div className="mg-rising" style={{ left: x }} aria-hidden="true">
+      {[0, 1, 2].map((k) => (
+        <div key={k} className="mg-rising__ring" style={{ '--k': k }}>
+          <div className={`mg-spin${k % 2 ? ' mg-spin--back' : ''}`}>
+            <Rune kind="volt" />
           </div>
-        ))}
+        </div>
+      ))}
     </div>
   );
 }

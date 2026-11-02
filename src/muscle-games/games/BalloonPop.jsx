@@ -5,7 +5,7 @@ import { pick, useFx } from '../fx/Fx.jsx';
 import { TimerBar, useCountdown } from '../components/Hud.jsx';
 import { scoreOutOf10 } from './meta.js';
 import {
-  BOMB_FUSE, FeetRunes, FirePortal, ICE_FREEZE, IceSigil, RuneLines, ULT_LENGTH, ULT_POP, ULT_STRIKE, UltSky, UltStrike, VOLT_SATELLITES,
+  BOMB_FUSE, FirePortal, ICE_FREEZE, IceSigil, RisingRunes, RuneLines, ULT_LENGTH, ULT_POP, ULT_STRIKE, UltSky, UltStrike, VOLT_SATELLITES,
 } from './BalloonSkills.jsx';
 
 // OL1 — functions and physiological properties of muscle tissue (lecture §1–2).
@@ -453,10 +453,10 @@ export default function BalloonPop({ onScore, onFinish }) {
   const [frozen, setFrozen] = useState(false);
   const [shake, setShake] = useState(false);
   const [shatter, setShatter] = useState(null);
-  // the skills on screen: the rune at the wizard's feet, the ice sky rune, and the ATP ultimate (with the round it
-  // was used in); each carries n so a new cast replays its animation (several start in the same millisecond, so
+  // the skills on screen: the runes rising round the wizard, the ice sky rune, and the ATP ultimate (with the round
+  // it was used in); each carries n so a new cast replays its animation (several start in the same millisecond, so
   // their keys also name the effect)
-  const [feet, setFeet] = useState(null);
+  const [rising, setRising] = useState(null);
   const [sigil, setSigil] = useState(null);
   const [ult, setUlt] = useState(null);
   // The wizard's last move ('cast' = fireball, 'ice' / 'fire' = casting that skill, 'ult' = the ATP ultimate); n
@@ -503,14 +503,14 @@ export default function BalloonPop({ onScore, onFinish }) {
     return orb ? [orb.left + orb.width / 2, orb.top + orb.height / 2] : [box.left + box.width / 2, box.bottom - 90];
   };
 
-  // The wizard raises his staff to cast a skill: his orb takes its colour and its rune spins at his feet.
+  // The wizard raises his staff to cast a skill and his orb takes its colour; for the ultimate, runes rise round him.
   const castSkill = (kind) => {
     const box = skyRef.current?.getBoundingClientRect();
     const wiz = wizardRef.current?.getBoundingClientRect();
     setWizardMove((m) => ({ n: m.n + 1, kind: kind === 'volt' ? 'ult' : kind }));
-    if (box && wiz) {
-      setFeet({ n: Date.now(), kind, x: wiz.left + wiz.width * 0.46 - box.left, rings: kind === 'volt' });
-      later(() => setFeet(null), (kind === 'volt' ? ULT_LENGTH : 1.6) * 1000);
+    if (kind === 'volt' && box && wiz) {
+      setRising({ n: Date.now(), x: wiz.left + wiz.width * 0.46 - box.left });
+      later(() => setRising(null), ULT_LENGTH * 1000);
     }
   };
 
@@ -715,7 +715,7 @@ export default function BalloonPop({ onScore, onFinish }) {
           />
         )}
         {shatter && <IceShatter key={`shatter${shatter.n}`}x={shatter.x} y={shatter.y} />}
-        {feet && <FeetRunes key={`feet${feet.n}`}kind={feet.kind} x={feet.x} rings={feet.rings} />}
+        {rising && <RisingRunes key={`rising${rising.n}`} x={rising.x} />}
         <div className="mg-castle" aria-hidden="true" />
         <div ref={wizardRef} key={`wizard${wizardMove.n}`} className={`mg-wizard${wizardMove.kind ? ` mg-wizard--${wizardMove.kind}` : ''}`} aria-hidden="true">
           <WizardArt />

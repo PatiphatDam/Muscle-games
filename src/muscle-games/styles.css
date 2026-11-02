@@ -610,21 +610,14 @@
 .mg-bolt__pose { opacity: 0; animation: mg-bolt-pose 0.12s steps(1) infinite; }
 @keyframes mg-bolt-pose { 0% { opacity: 1; } 33.34%, 100% { opacity: 0; } }
 
-/* The rune at the wizard's feet lies flat on the wall behind him while he casts (1.6 s); for the ultimate it is bigger,
-   stays 2.6 s and three more rise round him, one after another. */
-.mg-feet { --fs: 0.75; position: absolute; bottom: 58px; z-index: 6; width: 0; height: 0; pointer-events: none; }
-.mg-feet--volt { --fs: 1; }
-.mg-feet__base, .mg-feet__ring { position: absolute; left: -78px; top: -78px; width: 156px; height: 156px; }
-.mg-feet__base { animation: mg-feet-base 1.6s ease-out both; }
-.mg-feet--volt .mg-feet__base { animation-duration: 2.6s; }
-.mg-feet__ring { --rs: calc(0.8 - var(--k) * 0.1); opacity: 0; animation: mg-feet-ring 0.8s ease-out calc(0.15s + var(--k) * 0.16s) forwards; }
-@keyframes mg-feet-base {
-  0% { transform: scale(0); }
-  15% { transform: scale(var(--fs), calc(var(--fs) * 0.28)); }
-  80% { opacity: 1; }
-  100% { opacity: 0; transform: scale(var(--fs), calc(var(--fs) * 0.28)); }
+/* For the ultimate, three flat runes rise round the wizard from the wall at his feet, one after another, fading as they
+   go up. */
+.mg-rising { position: absolute; bottom: 58px; z-index: 6; width: 0; height: 0; pointer-events: none; }
+.mg-rising__ring {
+  --rs: calc(0.8 - var(--k) * 0.1); position: absolute; left: -78px; top: -78px; width: 156px; height: 156px; opacity: 0;
+  animation: mg-rising-ring 0.8s ease-out calc(0.15s + var(--k) * 0.16s) forwards;
 }
-@keyframes mg-feet-ring {
+@keyframes mg-rising-ring {
   0% { opacity: 0; transform: scale(var(--rs), calc(var(--rs) * 0.25)); }
   20% { opacity: 0.95; }
   100% { opacity: 0; transform: translateY(-160px) scale(var(--rs), calc(var(--rs) * 0.25)); }
