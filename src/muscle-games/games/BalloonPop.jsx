@@ -39,56 +39,106 @@ const FIRE_FLIGHT = 200;
 const PRAISE = ['Great spell! ✨', 'Bullseye!', 'Correct! 💪', 'Nice one!', 'Magic! 🪄'];
 const OOPS = ['Oops! Not that one', 'So close, try another!', 'Wrong balloon 😅'];
 
-// Ice and bomb flyer icons, drawn around (0, 0) so they sit exactly in the middle of the round flyer
-// (emoji glyphs carry their own padding and baseline, which pushed them off centre).
+// Ice and bomb flyers are skill orbs: the same glossy pearl as the wizard's staff orb (dark at the top, pale at the
+// bottom, a white shine), tinted for the skill and wrapped in its element so it reads at a glance. Ice: a ring of
+// frost crystals spins round it and snow trails behind. Bomb: a flickering flame corona, a little lit bomb inside and
+// embers trailing behind. Drawn around (0, 0) in a 48 x 48 box; the trail points left, the way the orb came from.
+const ORB_R = 11;
+const ORB_COLORS = {
+  ice: ['#0b3a8a', '#38a8f5', '#bfe6ff', '#ffffff'],
+  bomb: ['#7a1010', '#e0322b', '#ff9a6b', '#ffe0b0'],
+};
+const SIXTHS = [0, 60, 120, 180, 240, 300];
 
-// A star-shaped burst: `n` spikes alternating between the outer radii in `outer` and radius `inner`.
-function burst(n, outer, inner) {
+// a star with `n` points, as polygon points
+function star(x, y, outer, inner, n) {
   return Array.from({ length: n * 2 }, (_, k) => {
-    const r = k % 2 ? inner : outer[(k / 2) % outer.length];
+    const r = k % 2 ? inner : outer;
     const a = (Math.PI * k) / n - Math.PI / 2;
-    return `${(Math.cos(a) * r).toFixed(2)},${(Math.sin(a) * r).toFixed(2)}`;
+    return `${(x + Math.cos(a) * r).toFixed(2)},${(y + Math.sin(a) * r).toFixed(2)}`;
   }).join(' ');
 }
-const BURST_RED = burst(13, [11.6, 10.4, 11.2, 9.8, 11.8], 7.6);
-const BURST_YELLOW = burst(13, [9, 8.2, 8.8, 7.8], 6.6);
+const FUSE_SPARK = star(7, -6.5, 2.5, 0.85, 5);
 
-// Snow crystal: six feathered arms around a small hexagon.
-const ARM = 'M0 -2.4V-10.6 M0 -4.2l-2 -1.6M0 -4.2l2 -1.6 M0 -6.4l-2.6 -2M0 -6.4l2.6 -2 M0 -8.5l-1.7 -1.4M0 -8.5l1.7 -1.4';
-const HEX = Array.from({ length: 6 }, (_, k) => {
-  const a = (Math.PI * k) / 3 - Math.PI / 2;
-  return `${(Math.cos(a) * 2.2).toFixed(2)},${(Math.sin(a) * 2.2).toFixed(2)}`;
-}).join(' ');
+function SkillPearl({ kind }) {
+  const id = `mg-skill-${kind}`;
+  return (
+    <>
+      <defs>
+        <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+          {ORB_COLORS[kind].map((c, k) => (
+            <stop key={k} offset={[0, 0.5, 0.85, 1][k]} stopColor={c} />
+          ))}
+        </linearGradient>
+        <radialGradient id={`${id}-shade`} cx=".42" cy=".38" r=".64">
+          <stop offset=".55" stopColor="#2e3358" stopOpacity="0" />
+          <stop offset="1" stopColor="#2e3358" stopOpacity=".45" />
+        </radialGradient>
+      </defs>
+      <circle r={ORB_R} fill={`url(#${id})`} />
+      <circle r={ORB_R} fill={`url(#${id}-shade)`} />
+    </>
+  );
+}
+
+// the pearl's shine, over whatever sits inside it: a bounce light at the bottom, a small highlight at the top left
+function PearlShine() {
+  return (
+    <>
+      <ellipse cy="6.9" rx="6.4" ry="2.2" fill="#fff" opacity="0.45" />
+      <ellipse cx="-4.8" cy="-5.6" rx="2.8" ry="1.8" transform="rotate(-35 -4.8 -5.6)" fill="#fff" opacity="0.95" />
+      <circle cx="4.6" cy="-4.6" r="1.1" fill="#fff" />
+    </>
+  );
+}
 
 function IceIcon() {
   return (
-    <svg className="mg-flyer__icon mg-flyer__icon--ice" viewBox="-12 -12 24 24" aria-hidden="true">
-      <g strokeLinecap="round" strokeLinejoin="round" fill="none">
-        {[0, 60, 120, 180, 240, 300].map((a) => (
-          <g key={a} transform={`rotate(${a})`}>
-            <path d={ARM} stroke="#bfe3ff" strokeWidth="1.5" />
-            <path d={ARM} stroke="#ffffff" strokeWidth="0.6" />
-            <path d="M0 -10.6l-0.9 -0.9 0.9 -0.9 0.9 0.9z" fill="#ffffff" stroke="#ffffff" strokeWidth="0.4" />
-          </g>
-        ))}
-        <polygon points={HEX} stroke="#ffffff" strokeWidth="0.7" fill="#dff1ff" fillOpacity="0.35" />
+    <svg className="mg-flyer__icon" viewBox="-24 -24 48 48" aria-hidden="true">
+      <g className="mg-flyer__trail">
+        <circle cx="-18" cy="2" r="1.8" fill="#e0f2fe" />
+        <circle cx="-22" cy="-3" r="1.2" fill="#bae6fd" />
+        <circle cx="-21" cy="6" r="1" fill="#fff" />
       </g>
+      <g className="mg-flyer__spin">
+        {SIXTHS.map((a) => (
+          <polygon key={a} points="0,-17 1.6,-14.6 0,-12.4 -1.6,-14.6" fill="#e0f2fe" stroke="#7dd3fc" strokeWidth="0.5" transform={`rotate(${a})`} />
+        ))}
+      </g>
+      <circle r="13.4" fill="none" stroke="#bae6fd" strokeWidth="1" strokeDasharray="2 3" opacity="0.8" />
+      <SkillPearl kind="ice" />
+      <g stroke="#fff" strokeLinecap="round" fill="none">
+        {[0, 60, 120].map((a) => (
+          <path key={a} d="M0 -6V6" strokeWidth="1.4" transform={`rotate(${a})`} />
+        ))}
+        {SIXTHS.map((a) => (
+          <path key={a} d="M-1.9 -4.7L0 -2.9L1.9 -4.7" strokeWidth="1.1" transform={`rotate(${a})`} />
+        ))}
+      </g>
+      <PearlShine />
     </svg>
   );
 }
 
 function BombIcon() {
   return (
-    <svg className="mg-flyer__icon mg-flyer__icon--bomb" viewBox="-12 -12 24 24" aria-hidden="true">
-      <polygon points={BURST_RED} fill="#e8392b" stroke="#7a1010" strokeWidth="0.35" strokeLinejoin="round" />
-      <polygon points={BURST_YELLOW} fill="#fcd116" />
-      {/* fuse from the cap to a yellow spark, up and to the left */}
-      <path d="M-4.6 -4.6 C-6 -6.2 -6.4 -7 -7.6 -7.8" stroke="#222" strokeWidth="0.9" fill="none" strokeLinecap="round" />
-      <polygon points={burst(7, [2.4, 1.8], 1)} transform="translate(-8.6 -8.6)" fill="#fcd116" stroke="#e8a20b" strokeWidth="0.3" />
-      <rect x="-1.3" y="-7.6" width="2.6" height="2.4" rx="0.5" transform="rotate(-45)" fill="#2b2b2b" stroke="#111" strokeWidth="0.3" />
-      <circle className="mg-bomb-ball" r="6.2" fill="#2f2f33" stroke="#111" strokeWidth="0.4" />
-      <path d="M-3.6 -2.4 A4.4 4.4 0 0 1 -0.6 -4.4" stroke="#fff" strokeWidth="0.9" strokeLinecap="round" fill="none" opacity="0.85" />
-      <circle cx="1.6" cy="2" r="3.6" fill="#000" opacity="0.18" />
+    <svg className="mg-flyer__icon" viewBox="-24 -24 48 48" aria-hidden="true">
+      <g className="mg-flyer__trail">
+        <circle cx="-18" cy="3" r="1.8" fill="#fb923c" />
+        <circle cx="-22" cy="-2" r="1.2" fill="#fde047" />
+        <circle cx="-21" cy="7" r="1" fill="#f97316" />
+      </g>
+      <g className="mg-flyer__flames">
+        {[0, 45, 90, 135, 180, 225, 270, 315].map((a, k) => (
+          <path key={a} d={`M-3 -10Q0 ${k % 2 ? -20 : -17} 3 -10Z`} fill={k % 2 ? '#f97316' : '#fbbf24'} transform={`rotate(${a})`} />
+        ))}
+      </g>
+      <SkillPearl kind="bomb" />
+      <path d="M2.5 -4q1.5 -2.7 4 -2.1" stroke="#1f1f23" strokeWidth="1.05" fill="none" strokeLinecap="round" />
+      <circle r="4.75" fill="#1f1f23" />
+      <path d="M-2.7 -1.5a2.9 2.9 0 0 1 1.9 -1.9" stroke="#fff" strokeWidth="0.75" fill="none" strokeLinecap="round" opacity="0.7" />
+      <polygon className="mg-flyer__spark" points={FUSE_SPARK} fill="#fde047" />
+      <PearlShine />
     </svg>
   );
 }

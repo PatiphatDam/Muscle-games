@@ -593,21 +593,26 @@
 @keyframes mg-gone { to { opacity: 0; transform: scale(0.5); filter: grayscale(1); } }
 
 .mg-flyer {
-  --size: 34px;
+  --size: 44px;
   position: absolute; left: -80px; z-index: 5; width: var(--size); height: var(--size); border: 0; border-radius: 50%; cursor: crosshair;
-  display: grid; place-items: center; padding: 0; touch-action: manipulation;
+  display: grid; place-items: center; padding: 0; background: none; touch-action: manipulation;
   animation: mg-fly 5.5s linear var(--fdelay) forwards;
 }
-/* drawn bigger than the wizard's orb; the invisible ring keeps a 44px tap target */
+/* the invisible ring keeps a 44px tap target */
 .mg-flyer::after { content: ''; position: absolute; inset: calc((var(--size) - var(--tap)) / 2); border-radius: 50%; }
-.mg-flyer__icon { display: block; width: 62%; height: 62%; pointer-events: none; }
-.mg-flyer__icon--ice { width: 78%; height: 78%; filter: drop-shadow(0 0 2px #9fd8ff); }
-.mg-flyer__icon--bomb { width: 92%; height: 92%; }
+.mg-flyer__icon { display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+/* flying right to left, the orb turns round so its trail stays behind it */
 .mg-flyer--rev { animation-direction: reverse; animation-fill-mode: both; }
-/* ice: a glowing snow crystal inside a deep blue glass orb */
-.mg-flyer--ice { background: radial-gradient(circle at 35% 28%, #6fb7ff 0 6%, #1e4fa8 30%, #0b1f4d 75%); box-shadow: 0 0 10px #7dd3fc, inset 0 0 5px rgba(125, 211, 252, 0.6); }
-/* bomb: a glossy black comic bomb on a red and yellow explosion */
-.mg-flyer--bomb { background: radial-gradient(circle, #3a1d1d, #1f1414); box-shadow: 0 0 9px rgba(239, 68, 68, 0.8); }
+.mg-flyer--rev .mg-flyer__icon { transform: scaleX(-1); }
+/* the skill orbs' element: snow or embers drift off behind, frost crystals spin, flames flicker, the fuse twinkles */
+.mg-flyer__trail { animation: mg-flyer-trail 0.5s linear infinite; }
+.mg-flyer__spin { animation: mg-flyer-spin 4s linear infinite; }
+.mg-flyer__flames { animation: mg-flyer-flick 0.16s steps(2) infinite; }
+.mg-flyer__spark { transform-box: fill-box; transform-origin: center; animation: mg-flyer-spark 1.2s ease-in-out infinite; }
+@keyframes mg-flyer-trail { from { transform: none; opacity: 1; } to { transform: translateX(-10px); opacity: 0; } }
+@keyframes mg-flyer-spin { to { transform: rotate(360deg); } }
+@keyframes mg-flyer-flick { 50% { transform: scale(1.06, 0.94); } }
+@keyframes mg-flyer-spark { 0%, 100% { transform: scale(0.5); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } }
 @keyframes mg-fly { 0% { left: -80px; transform: translateY(0); } 25% { transform: translateY(-14px); } 50% { transform: translateY(8px); } 75% { transform: translateY(-10px); } 100% { left: calc(100% + 20px); transform: translateY(0); } }
 
 /* Castle backdrop: a far, faded layer (mirrored) behind a near shadow layer. */
