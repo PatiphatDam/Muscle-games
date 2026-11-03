@@ -269,16 +269,16 @@ export function GroupSortScene() {
       <GsLens x={109} y={30.3} />
       {/* ...and "SORT" stencilled black on a yellow steel plate for the factory, its O a hex nut */}
       {/* just around the letters, with deep cut corners and a rivet at each end */}
-      <g transform="translate(171 19)">
+      <g transform="translate(161 19)">
         <path d="M6 0H74L80 6V17L74 23H6L0 17V6Z" fill="#facc15" stroke={GS_INK} strokeWidth="1.6" />
         <rect x="2.3" y="10.2" width="2.6" height="2.6" fill={GS_INK} />
         <rect x="75.1" y="10.2" width="2.6" height="2.6" fill={GS_INK} />
       </g>
       <g fontFamily="'Black Ops One', 'Nunito Sans Variable', sans-serif" fontSize="22" fill={GS_INK}>
-        <text x="194" y="38" textAnchor="end">S</text>
-        <text x="215" y="38">RT</text>
+        <text x="184" y="38" textAnchor="end">S</text>
+        <text x="205" y="38">RT</text>
       </g>
-      <GsNut x={204.5} y={30.5} />
+      <GsNut x={194.5} y={30.5} />
     </svg>
   );
 }
