@@ -284,11 +284,11 @@ function GaugeLightning() {
   );
 }
 
-// The badge icon is the ATP skill orb, matching the ice and fire orbs: deep-blue glass in a gold rim, set in the volt
-// rune, with a still picture of an anime lightning strike inside (a yellow zigzag with a white core and sky-blue
-// forks). Dimmed until the tube is full; then it glows, the rune turns and a ring pulses out.
-const ORB_STRIKE = 'M-1.6-8.6L1-4.6L-1.6-2L2.6 1.6L-0.6 4.2L1.6 8.4';
-const ORB_FORKS = 'M1-4.6L4.6-6.2L6.2-3.6M-1.6-2L-5.2-1L-6.8 2.2M2.6 1.6L5.8 3.2M-0.6 4.2L-3.8 6.2';
+// The badge icon is the ATP skill orb, matching the ice and fire orbs: deep-blue glass in a gold rim, set in the
+// spinning volt rune, with light-blue chips circling inside round a sharp yellow anime bolt (deep-blue edge, two
+// sky-blue forks). Dimmed until the tube is full; then it glows, the rune turns and a ring pulses out.
+const BADGE_BOLT = '16.8,0.8 7.4,10.8 11.2,11 4.4,18.4 8,18.6 3.4,23.4 15.4,13.4 11.8,13.2 19.4,5.6 15.4,5.4 20.2,0.8';
+const ATP_CHIPS = [[30, 9], [150, 8.4], [270, 9.2]];
 function BadgeBolt() {
   return (
     <svg className="mg-gauge__icon" viewBox="-20 -20 40 40">
@@ -306,12 +306,22 @@ function BadgeBolt() {
         </radialGradient>
       </defs>
       <circle r="11" fill="url(#mg-orb-atp)" />
-      <g clipPath="url(#mg-orb-atp-clip)" fill="none" strokeLinecap="round" strokeLinejoin="miter">
-        <path d={ORB_FORKS} stroke="#38bdf8" strokeOpacity="0.45" strokeWidth="2.2" />
-        <path d={ORB_FORKS} stroke="#7dd3fc" strokeWidth="0.8" />
-        <path d={ORB_STRIKE} stroke="#38bdf8" strokeOpacity="0.5" strokeWidth="3.4" />
-        <path d={ORB_STRIKE} stroke="#facc15" strokeWidth="1.7" />
-        <path d={ORB_STRIKE} stroke="#fffbeb" strokeWidth="0.6" />
+      <linearGradient id="mg-badge-bolt" x1="0.8" y1="0" x2="0.2" y2="1">
+        <stop offset="0" stopColor="#fef9c3" />
+        <stop offset="0.45" stopColor="#facc15" />
+        <stop offset="1" stopColor="#f59e0b" />
+      </linearGradient>
+      <g clipPath="url(#mg-orb-atp-clip)">
+        <g className="mg-orb__chips">
+          {ATP_CHIPS.map(([a, r]) => (
+            <polygon key={a} points="0,-1.8 0.9,0 0,1.8 -0.9,0" fill="#7dd3fc" opacity="0.7" transform={`rotate(${a}) translate(0 ${-r})`} />
+          ))}
+        </g>
+      </g>
+      <g transform="scale(0.76) translate(-12 -12)">
+        <path d="M9.6 7.8l-3.4-0.4-1.6-2.8M8.2 8.6l-2.4 1.4M14.4 16.2l3.2 0.8 1.2 2.8M15.6 15.4l2.6-1.2" fill="none" stroke="#38bdf8" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M9.6 7.8l-3.4-0.4-1.6-2.8M14.4 16.2l3.2 0.8 1.2 2.8" fill="none" stroke="#e0f2fe" strokeWidth="0.5" strokeLinecap="round" strokeLinejoin="round" />
+        <polygon points={BADGE_BOLT} fill="url(#mg-badge-bolt)" stroke="#1e3a8a" strokeWidth="1.3" strokeLinejoin="miter" />
       </g>
       <OrbGlass id="mg-orb-atp" rim={['#fde68a', '#8a5a12']} />
     </svg>

@@ -827,7 +827,7 @@
 /* The cream frame shows between the vessels as thin dividers; its bottom edge overlaps the tube's top border
    (the button is 44 px tall around a 27 px tube, so it starts 8.5 px above it). */
 .mg-gauge__lives {
-  position: relative; z-index: 2; display: flex; gap: 2px; width: 114px; margin: 0 0 -10px 46px; padding: 2px 2px 0;
+  position: relative; z-index: 2; display: flex; gap: 2px; width: 114px; margin: 0 0 -10px 53px; padding: 2px 2px 0;
   border-radius: 4px 4px 0 0; background: #f8e7d0; transform: skewX(-32deg); box-shadow: 0 -1px 3px rgb(0 0 0 / 0.35);
 }
 .mg-gauge__lives i {
@@ -852,7 +852,7 @@
 .mg-gauge__icon { width: 50px; height: 50px; overflow: visible; filter: saturate(0.35) brightness(0.6) drop-shadow(0 2px 0 rgb(0 0 0 / 0.5)); }
 .mg-gauge__pulse { opacity: 0; }
 /* the tube and its lightning share one steep slant, so the bolts follow the tube's edges */
-.mg-gauge__slant { position: relative; display: block; margin-left: -10px; transform: skewX(-32deg); }
+.mg-gauge__slant { position: relative; display: block; margin-left: -3px; transform: skewX(-32deg); }
 .mg-gauge__tube {
   position: relative; display: flex; gap: 3px; padding: 4px 8px 4px 16px; overflow: hidden;
   border-radius: 4px; background: #120b24; border: 2px solid #f8e7d0;
