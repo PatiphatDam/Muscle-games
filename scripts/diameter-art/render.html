@@ -76,6 +76,8 @@ window.renderLevel = async (cfg) => {
   cam.position.copy(dir.multiplyScalar(dist));
   cam.lookAt(0, 0, 0);
   if (cfg.pan) { cam.position.add(new THREE.Vector3(...cfg.pan)); }
+  // shift: move the picture on screen, in px of the render (positive y = the model moves up)
+  if (cfg.shift) cam.setViewOffset(W, H, -(cfg.shift[0] ?? 0), cfg.shift[1] ?? 0, W, H);
 
   const shot = () => { renderer.render(scene, cam); return renderer.domElement.toDataURL('image/png'); };
   const result = { full: shot() };
