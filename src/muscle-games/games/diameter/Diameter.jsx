@@ -285,12 +285,12 @@ export default function Diameter({ onScore, onFinish, runId, setExitReport }) {
       return;
     }
     if (task?.type !== 'tap' || taskDone) return;
-    // Wrapping layers overlap what they wrap, so a point can be on two parts: the one asked for wins if the point is
-    // on it; otherwise the part right under the finger, then the nearest within a few pixels.
+    // Parts overlap and some are thin (T-tubules on a phone are a few pixels wide), so the part asked for wins if the
+    // finger is on it or within a few pixels of it; otherwise the part right under the finger, then the nearest.
     const want = task.seq[seqI];
     const ids = step.parts.map((x) => x.id);
     const mask = (id) => maskOf.current[`${step.id}-${id}`];
-    const hit = onPart(mask(want), p.fx, p.fy, 0) ? want : ids.find((id) => onPart(mask(id), p.fx, p.fy, 0)) ?? ids.find((id) => onPart(mask(id), p.fx, p.fy));
+    const hit = onPart(mask(want), p.fx, p.fy) ? want : ids.find((id) => onPart(mask(id), p.fx, p.fy, 0)) ?? ids.find((id) => onPart(mask(id), p.fx, p.fy));
     if (!hit) return;
     const name = (id) => step.parts.find((x) => x.id === id).name;
     if (hit === want) {
