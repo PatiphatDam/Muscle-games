@@ -11,6 +11,9 @@ import { DECOYS, PREDICT_CHOICES, STEPS, TOTAL_ANSWERS, art } from './levels.js'
 // all five steps; a wrong answer costs 5 s on the clock (shown, not scored) but never points already won.
 const W = 900; // every render is 900 x 600
 const H = 600;
+// shapes are tested on a half-size copy: a quarter of the pixels to read when a step loads (a 1-px slip is 2 px)
+const MW = W / 2;
+const MH = H / 2;
 const HINTS = 3;
 const shuffle = (a) => a.map((v) => [Math.random(), v]).sort((x, y) => x[0] - y[0]).map((v) => v[1]);
 
@@ -22,21 +25,21 @@ function loadMask(name) {
     const img = new Image();
     img.onload = () => {
       const c = document.createElement('canvas');
-      c.width = W;
-      c.height = H;
+      c.width = MW;
+      c.height = MH;
       const x = c.getContext('2d', { willReadFrequently: true });
-      x.drawImage(img, 0, 0, W, H);
-      const d = x.getImageData(0, 0, W, H).data;
-      const a = new Uint8Array(W * H);
-      let x0 = W;
-      let y0 = H;
+      x.drawImage(img, 0, 0, MW, MH);
+      const d = x.getImageData(0, 0, MW, MH).data;
+      const a = new Uint8Array(MW * MH);
+      let x0 = MW;
+      let y0 = MH;
       let x1 = 0;
       let y1 = 0;
-      for (let i = 0; i < W * H; i++) {
+      for (let i = 0; i < MW * MH; i++) {
         a[i] = d[i * 4 + 3];
         if (a[i] > 30) {
-          const px = i % W;
-          const py = (i / W) | 0;
+          const px = i % MW;
+          const py = (i / MW) | 0;
           if (px < x0) x0 = px;
           if (px > x1) x1 = px;
           if (py < y0) y0 = py;
@@ -47,7 +50,8 @@ function loadMask(name) {
       t.width = x1 - x0 + 3;
       t.height = y1 - y0 + 3;
       t.getContext('2d').drawImage(c, x0 - 1, y0 - 1, t.width, t.height, 0, 0, t.width, t.height);
-      resolve({ a, box: { x0, y0, x1, y1 }, thumb: t.toDataURL() });
+      // the box in full-size pixels
+      resolve({ a, box: { x0: x0 * 2, y0: y0 * 2, x1: x1 * 2 + 1, y1: y1 * 2 + 1 }, thumb: t.toDataURL() });
     };
     img.onerror = () => resolve(null);
     img.src = art(name);
@@ -55,16 +59,17 @@ function loadMask(name) {
   masks.set(name, p);
   return p;
 }
-// Is the point (fractions of the picture) on the part — within `reach` px, so a finger need not be pixel-perfect?
-function onPart(mask, fx, fy, reach = 14) {
+// Is the point (fractions of the picture) on the part — within `reach` mask px (7 = 14 px of the render), so a finger
+// need not be pixel-perfect?
+function onPart(mask, fx, fy, reach = 7) {
   if (!mask) return false;
-  const cx = Math.round(fx * W);
-  const cy = Math.round(fy * H);
-  for (let dy = -reach; dy <= reach; dy += 7)
-    for (let dx = -reach; dx <= reach; dx += 7) {
-      const x = cx + dx;
-      const y = cy + dy;
-      if (x >= 0 && y >= 0 && x < W && y < H && mask.a[y * W + x] > 30) return true;
+  const cx = Math.round(fx * MW);
+  const cy = Math.round(fy * MH);
+  for (let dy = -reach; dy <= reach; dy += 3.5)
+    for (let dx = -reach; dx <= reach; dx += 3.5) {
+      const x = Math.round(cx + dx);
+      const y = Math.round(cy + dy);
+      if (x >= 0 && y >= 0 && x < MW && y < MH && mask.a[y * MW + x] > 30) return true;
     }
   return false;
 }
