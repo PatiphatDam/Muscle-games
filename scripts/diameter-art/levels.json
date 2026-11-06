@@ -1,0 +1,285 @@
+[
+ {
+  "id": "muscle",
+  "model": "/models/arm.glb",
+  "view": [
+   -1,
+   0.1,
+   0.3
+  ],
+  "fit": 1.02,
+  "see": {
+   "Epimysium": 0.45
+  },
+  "colour": {
+   "Epimysium": "#eef2f7",
+   "Humerus": "#e8dfcc",
+   "Radius": "#e8dfcc",
+   "Ulna": "#e8dfcc",
+   "Scapula": "#e8dfcc",
+   "Clavicle": "#e8dfcc",
+   "Long head of biceps brachii": "#d0473c",
+   "Short head of biceps brachii": "#d0473c"
+  },
+  "parts": [
+   {
+    "id": "biceps",
+    "keys": [
+     "Long head of biceps brachii",
+     "Short head of biceps brachii"
+    ]
+   },
+   {
+    "id": "triceps",
+    "keys": [
+     "Long head of triceps brachii",
+     "Lateral head of triceps brachii",
+     "Medial head of triceps brachii"
+    ]
+   },
+   {
+    "id": "epimysium",
+    "keys": [
+     "Epimysium"
+    ]
+   },
+   {
+    "id": "bone",
+    "keys": [
+     "Humerus",
+     "Radius",
+     "Ulna"
+    ]
+   }
+  ],
+  "zoom": 0.66,
+  "up": [
+   0,
+   0,
+   1
+  ]
+ },
+ {
+  "id": "fascicle",
+  "model": "/models/fascicle.glb",
+  "view": [
+   0.9,
+   0.55,
+   1
+  ],
+  "fit": 0.82,
+  "see": {
+   "Perimysium": 0.5,
+   "Endomysium": 0.35
+  },
+  "parts": [
+   {
+    "id": "perimysium",
+    "keys": [
+     "Perimysium"
+    ]
+   },
+   {
+    "id": "endomysium",
+    "keys": [
+     "Endomysium"
+    ]
+   },
+   {
+    "id": "fibers",
+    "keys": [
+     "Fibers"
+    ]
+   },
+   {
+    "id": "nerve",
+    "keys": [
+     "Motor neuron branches",
+     "Nerve"
+    ]
+   },
+   {
+    "id": "vessel",
+    "keys": [
+     "Blood vessel"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "fiber",
+  "model": "/models/fiber.glb",
+  "view": [
+   0.9,
+   0.5,
+   1
+  ],
+  "fit": 0.9,
+  "see": {
+   "Endomysium": 0.38
+  },
+  "parts": [
+   {
+    "id": "sarcolemma",
+    "keys": [
+     "Sarcolemma"
+    ]
+   },
+   {
+    "id": "nuclei",
+    "keys": [
+     "Nuclei"
+    ]
+   },
+   {
+    "id": "nmj",
+    "keys": [
+     "Motor neuron axon",
+     "Axon terminal"
+    ]
+   },
+   {
+    "id": "ttubule",
+    "keys": [
+     "T-tubules"
+    ]
+   },
+   {
+    "id": "cisternae",
+    "keys": [
+     "Terminal cisternae"
+    ]
+   },
+   {
+    "id": "sr",
+    "keys": [
+     "Sarcoplasmic reticulum"
+    ]
+   },
+   {
+    "id": "myofibril",
+    "keys": [
+     "Myofibrils"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "myofibril",
+  "model": "/models/myofibril.glb",
+  "view": [
+   0.3,
+   0.75,
+   1
+  ],
+  "fit": 0.78,
+  "parts": [
+   {
+    "id": "zdisc",
+    "keys": [
+     "Z discs"
+    ]
+   },
+   {
+    "id": "thick",
+    "keys": [
+     "Thick filaments"
+    ]
+   },
+   {
+    "id": "thin",
+    "keys": [
+     "Thin filaments"
+    ]
+   },
+   {
+    "id": "mline",
+    "keys": [
+     "M lines"
+    ]
+   }
+  ],
+  "zoom": 0.6
+ },
+ {
+  "id": "sarcomere",
+  "model": "/models/sarcomere.glb",
+  "view": [
+   0.35,
+   0.45,
+   1
+  ],
+  "fit": 0.95,
+  "parts": [
+   {
+    "id": "zdisc",
+    "keys": [
+     "Z discs"
+    ]
+   },
+   {
+    "id": "mline",
+    "keys": [
+     "M lines"
+    ]
+   },
+   {
+    "id": "thick",
+    "keys": [
+     "Thick filaments"
+    ]
+   },
+   {
+    "id": "thin",
+    "keys": [
+     "Thin filaments"
+    ]
+   },
+   {
+    "id": "titin",
+    "keys": [
+     "Titin"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "decoy",
+  "model": "/models/densebodies.glb",
+  "view": [
+   0.45,
+   0.6,
+   1
+  ],
+  "fit": 0.66,
+  "alone": true,
+  "parts": [
+   {
+    "id": "dense",
+    "mats": [
+     "Dense body",
+     "Dense body (membrane)"
+    ]
+   }
+  ]
+ },
+ {
+  "id": "decoy2",
+  "model": "/models/cardiomyocyte.glb",
+  "view": [
+   0.45,
+   0.5,
+   1
+  ],
+  "fit": 1,
+  "alone": true,
+  "parts": [
+   {
+    "id": "idisc",
+    "keys": [
+     "Intercalated discs"
+    ]
+   }
+  ]
+ }
+]

@@ -1,0 +1,102 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<script type="importmap">{ "imports": { "three": "/nm/three/build/three.module.js", "three/addons/": "/nm/three/examples/jsm/" } }</script>
+</head><body style="margin:0;background:#000">
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+
+const W = 900, H = 600, SIZE = 4;
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setSize(W, H);
+renderer.setPixelRatio(1);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.setClearColor(0x000000, 0);
+document.body.appendChild(renderer.domElement);
+const loader = new GLTFLoader();
+loader.setMeshoptDecoder(MeshoptDecoder);
+
+const nodeKey = (o) => String(o.userData.name ?? o.name).replace(/\.\d+$/, '').replace(/\.[lr]$/, '');
+function partKey(o) { let n = o; while (n && n.userData.name === undefined) n = n.parent; return nodeKey(n ?? o); }
+
+function crop(canvas) {
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d'); x.drawImage(canvas, 0, 0);
+  const d = x.getImageData(0, 0, W, H).data;
+  let x0 = W, y0 = H, x1 = -1, y1 = -1;
+  for (let y = 0; y < H; y++) for (let i = 0; i < W; i++) if (d[(y * W + i) * 4 + 3] > 24) { if (i < x0) x0 = i; if (i > x1) x1 = i; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  if (x1 < 0) return null;
+  return { x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 };
+}
+
+window.probe = async (model) => {
+  const g = await loader.loadAsync(model);
+  const out = {};
+  g.scene.traverse((o) => { if (o.isMesh) { const k = partKey(o) + ' | mat:' + (o.material?.name ?? ''); out[k] = (out[k] || 0) + 1; } });
+  return out;
+};
+
+// cfg: { model, view:[x,y,z], fit, colour?: {key: '#hex', default}, see: {key: opacity}, parts: [{ id, keys: [...], mats: [...] }] }
+window.renderLevel = async (cfg) => {
+  const g = await loader.loadAsync(cfg.model);
+  const root = g.scene;
+  const meshes = [];
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    const key = partKey(o);
+    const src = o.material;
+    let mat;
+    if (cfg.colour) mat = new THREE.MeshStandardMaterial({ color: cfg.colour[key] ?? (cfg.colourRule ? (new Function('k', cfg.colourRule))(key) : '#9c5a50'), roughness: 0.6 });
+    else mat = src.clone();
+    const see = cfg.see?.[key];
+    if (see !== undefined) { mat.transparent = true; mat.opacity = see; mat.depthWrite = false; }
+    o.material = mat;
+    meshes.push({ o, key, matName: src?.name ?? '', mat, see: see !== undefined });
+  });
+  root.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(root);
+  const size = box.getSize(new THREE.Vector3());
+  const s = SIZE / Math.max(size.x, size.y, size.z);
+  root.position.copy(box.getCenter(new THREE.Vector3()).multiplyScalar(-s));
+  root.scale.setScalar(s);
+  const scene = new THREE.Scene();
+  scene.add(root);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+  const d1 = new THREE.DirectionalLight(0xffffff, 1.7); d1.position.set(4, 6, 6); scene.add(d1);
+  const d2 = new THREE.DirectionalLight(0xffffff, 0.5); d2.position.set(-5, -2, -4); scene.add(d2);
+  const cam = new THREE.PerspectiveCamera(38, W / H, 0.05, 200);
+  const r = (SIZE / 2) * (cfg.fit ?? 1);
+  const vfov = (38 * Math.PI) / 180;
+  const hfov = 2 * Math.atan(Math.tan(vfov / 2) * (W / H));
+  const dist = r / Math.sin(Math.min(vfov, hfov) / 2) * (cfg.zoom ?? 1);
+  const dir = new THREE.Vector3(...cfg.view).normalize();
+  if (cfg.up) cam.up.set(...cfg.up);
+  cam.position.copy(dir.multiplyScalar(dist));
+  cam.lookAt(0, 0, 0);
+  if (cfg.pan) { cam.position.add(new THREE.Vector3(...cfg.pan)); }
+
+  const shot = () => { renderer.render(scene, cam); return renderer.domElement.toDataURL('image/png'); };
+  const result = { full: shot() };
+  const grey = new THREE.MeshStandardMaterial({ color: cfg.grey ?? '#a3acb9', roughness: 0.75 });
+  meshes.forEach((m) => { const gm = grey.clone(); if (m.see) { gm.transparent = true; gm.opacity = m.mat.opacity; gm.depthWrite = false; } m.o.material = gm; });
+  result.grey = shot();
+  const depthOnly = new THREE.MeshBasicMaterial({ colorWrite: false });
+  result.parts = {};
+  for (const p of cfg.parts) {
+    const mine = (m) => (p.keys || []).includes(m.key) || (p.mats || []).includes(m.matName);
+    meshes.forEach((m) => {
+      if (mine(m)) { const mm = m.mat.clone(); mm.transparent = false; mm.opacity = 1; mm.depthWrite = true; m.o.material = mm; m.o.visible = true; }
+      else if (m.see || cfg.alone) m.o.visible = false;
+      else { m.o.material = depthOnly; m.o.visible = true; }
+    });
+    const png = shot();
+    result.parts[p.id] = { png, box: crop(renderer.domElement), n: meshes.filter(mine).length };
+    meshes.forEach((m) => { m.o.visible = true; });
+  }
+  meshes.forEach((m) => { m.o.material = m.mat; });
+  return result;
+};
+window.ready = true;
+</script></body></html>
