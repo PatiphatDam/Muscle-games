@@ -115,7 +115,10 @@
    1
   ],
   "fit": 0.98,
-  "shift": [0, 18],
+  "shift": [
+   0,
+   18
+  ],
   "see": {
    "Endomysium": 0.38
   },
@@ -243,6 +246,54 @@
     ]
    }
   ]
+ },
+ {
+  "id": "filaments",
+  "model": "/models/filaments.glb",
+  "view": [
+   0,
+   0.3,
+   1
+  ],
+  "fit": 0.95,
+  "parts": [
+   {
+    "id": "thick",
+    "keys": [
+     "Thick filament"
+    ]
+   },
+   {
+    "id": "heads",
+    "keys": [
+     "Myosin head"
+    ]
+   },
+   {
+    "id": "actin",
+    "keys": [
+     "Actin"
+    ]
+   },
+   {
+    "id": "tropomyosin",
+    "keys": [
+     "Tropomyosin"
+    ]
+   },
+   {
+    "id": "troponin",
+    "keys": [
+     "Troponin C",
+     "Troponin I",
+     "Troponin T"
+    ]
+   }
+  ],
+  "see": {
+   "Actin": 0.4,
+   "Thick filament": 0.4
+  }
  },
  {
   "id": "decoy",
