@@ -1,0 +1,21 @@
+<!doctype html>
+<!-- GitHub Pages serves this for any path it has no file for (copied to 404.html by .github/workflows/pages.yml).
+     The app uses a HashRouter, so /Muscle-games/games/diameter is sent on to /Muscle-games/#/games/diameter. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Muscle Games</title>
+    <script>
+      (function () {
+        var parts = location.pathname.split('/');
+        var base = '/' + (parts[1] ? parts[1] + '/' : '');
+        var rest = parts.slice(2).join('/').replace(/\/+$/, '');
+        location.replace(base + (rest ? '#/' + rest : '') + location.search);
+      })();
+    </script>
+  </head>
+  <body style="background:#0f1720;color:#cbd5e1;font-family:system-ui,sans-serif;text-align:center;padding-top:20vh">
+    Opening the games…
+  </body>
+</html>
